@@ -1,0 +1,73 @@
+## Build results
+bin/
+obj/
+
+## Rider
+.idea/
+*.sln.iml
+
+## User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## ASP.NET Core Secrets
+**/secrets.json
+
+## Logs
+*.log
+
+## IIS Express
+.vs/
+*.vspscc
+*.vssscc
+
+## Web config transforms
+*.Release.config
+*.Debug.config
+
+## NPM & Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+## Paket dependency manager
+.paket/
+paket-files/
+
+## LibMan
+wwwroot/lib/
+
+## Azure Pipelines artifacts
+*.azure-pipelines.yml
+
+## Publish output
+publish/
+out/
+
+## Rider HTTP client requests
+httpRequests/
+
+## dotenv
+.env
+.env.*
+
+## Coverage reports
+coverage/
+coverage-report/
+
+## Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+## Others
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+*.idea/
+*.ncrunch*
+*.VisualState.xml
+TestResult*/
