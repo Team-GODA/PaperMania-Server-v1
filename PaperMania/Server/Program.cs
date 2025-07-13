@@ -26,6 +26,13 @@ builder.Services.AddScoped<IAccountRepository>(provider =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+});
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();
