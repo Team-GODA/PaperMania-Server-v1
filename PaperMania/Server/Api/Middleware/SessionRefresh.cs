@@ -13,21 +13,26 @@ public class SessionRefresh
     
     public async Task InvokeAsync(HttpContext context)
     {
-        if (context.Request.Headers.TryGetValue("Session-Id", out var sessionIds))
+        var path = context.Request.Path.Value ?? "";
+        var method = context.Request.Method;
+
+        if (!(path.Equals("/api/v1/auth/logout", StringComparison.OrdinalIgnoreCase) && method == "POST"))
         {
-            var sessionId = sessionIds.FirstOrDefault();
-            if (!string.IsNullOrEmpty(sessionId))
+            if (context.Request.Headers.TryGetValue("Session-Id", out var sessionIds))
             {
-                var sessionService = context.RequestServices.GetRequiredService<ISessionService>();
-                
-                bool valid = await sessionService.ValidateSessionAsync(sessionId);
-                if (valid)
+                var sessionId = sessionIds.FirstOrDefault();
+                if (!string.IsNullOrEmpty(sessionId))
                 {
-                    await sessionService.RefreshSessionAsync(sessionId);
+                    var sessionService = context.RequestServices.GetRequiredService<ISessionService>();
+
+                    bool valid = await sessionService.ValidateSessionAsync(sessionId);
+                    if (valid)
+                    {
+                        await sessionService.RefreshSessionAsync(sessionId);
+                    }
                 }
             }
         }
-
         await _next(context);
     }
 }

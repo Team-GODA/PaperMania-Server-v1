@@ -96,7 +96,7 @@ namespace Server.Api.Controller
             }
         }
 
-        [HttpDelete("logout")]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromHeader(Name = "Session-Id")] string sessionId)
         {
             _logger.LogInformation("로그아웃 시도: SessionId={SessionId}", sessionId);
