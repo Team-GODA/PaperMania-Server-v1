@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Server.Api.Middleware;
 using Server.Application.Port;
 using Server.Infrastructure.Repository;
 using Server.Infrastructure.Service;
@@ -36,6 +37,8 @@ builder.Services.AddApiVersioning(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<SessionRefresh>();
+r
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
