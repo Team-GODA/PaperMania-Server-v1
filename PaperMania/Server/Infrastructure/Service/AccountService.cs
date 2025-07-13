@@ -61,8 +61,13 @@ public class AccountService : IAccountService
         return true;
     }
 
-    public async Task UpdateLastLoginAsync(int playerId)
+    public async Task UpdateLastLoginAsync(int userId)
     {
-        throw new NotImplementedException();
+        var account = await _repository.GetByPlayerIdAsync(userId.ToString());
+        if (account != null)
+        {
+            account.LastLogin = DateTime.UtcNow;
+            await _repository.UpdateLastLoginAsync(account.Id);
+        }
     }
 }

@@ -9,5 +9,5 @@ public interface IAccountService
     Task RegisterAsync(PlayerAccountData player, string password);
     Task<string?> LoginAsync(string playerId, string password);
     Task<bool> LogoutAsync(string sessionId);
-    Task UpdateLastLoginAsync(int playerId);
+    Task UpdateLastLoginAsync(int userId);
 }
