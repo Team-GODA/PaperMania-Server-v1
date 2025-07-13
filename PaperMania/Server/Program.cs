@@ -20,10 +20,15 @@ builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository>(provider =>
-{
-    var connectionString = builder.Configuration["AccountDbConnectionString"];
-    return new AccountRepository(connectionString!);
-});
+    {
+        var connectionString = builder.Configuration["AccountDbConnectionString"];
+        return new AccountRepository(connectionString!);
+    });
+builder.Services.AddScoped<IDataRepository>(provider =>
+    {
+        var connectionString = builder.Configuration["GameDataDbConnectionString"];
+        return new DataRepository(connectionString!);
+    });
 
 
 builder.Services.AddControllers();
