@@ -2,13 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches:
-      - develop
-      - main
+    branches: [develop, main]
   pull_request:
-    branches:
-      - develop
-      - main
+    branches: [develop, main]
 
 jobs:
   build-and-test:
@@ -24,10 +20,10 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore PaperMania/PaperMania.sln
+        run: dotnet restore PaperMania/Server/Server.csproj
 
-      - name: Build solution
-        run: dotnet build PaperMania/PaperMania.sln --no-restore --configuration Release
+      - name: Build project
+        run: dotnet build PaperMania/Server/Server.csproj --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test PaperMania/PaperMania.sln --no-build --verbosity normal --configuration Release
+        run: dotnet test PaperMania/Server/Server.csproj --no-build --configuration Release
