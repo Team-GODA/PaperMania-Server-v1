@@ -18,7 +18,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Show repo files under PaperMania directory
+      - name: Show repo files
+        run: ls -R
+
+      - name: Show files in PaperMania directory
         run: ls -R PaperMania
 
       - name: Setup .NET SDK
@@ -27,10 +30,13 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore PaperMania/PaperMania.sln
+        working-directory: PaperMania
+        run: dotnet restore PaperMania.sln
 
       - name: Build solution
-        run: dotnet build PaperMania/PaperMania.sln --no-restore --configuration Release
+        working-directory: PaperMania
+        run: dotnet build PaperMania.sln --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test PaperMania/PaperMania.sln --no-build --verbosity normal --configuration Release
+        working-directory: PaperMania
+        run: dotnet test PaperMania.sln --no-build --verbosity normal --configuration Release
