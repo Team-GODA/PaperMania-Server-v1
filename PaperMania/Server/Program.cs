@@ -38,7 +38,7 @@ builder.Services.AddApiVersioning(options =>
 var app = builder.Build();
 
 app.UseMiddleware<SessionRefresh>();
-r
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
