@@ -8,4 +8,6 @@ public class PlayerAccountData
     public string Password { get; set; } = null!;
     public bool IsNewAccount { get; set; } = true;
     public string Role { get; set; } = null!;
+    public DateTime CreatedAt { get; set; }
+    public DateTime? LastLogin { get; set; }
 }
