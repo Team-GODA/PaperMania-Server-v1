@@ -6,6 +6,6 @@ public interface IAccountRepository
 {
     Task<PlayerAccountData?> GetByPlayerIdAsync(string playerId);
     Task<PlayerAccountData?> GetByEmailAsync(string email);
-    Task AddAsync(PlayerAccountData player);
+    Task AddAccountAsync(PlayerAccountData player);
     Task UpdateLastLoginAsync(int playerId);
 }
