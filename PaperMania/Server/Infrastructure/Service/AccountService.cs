@@ -34,7 +34,7 @@ public class AccountService : IAccountService
         await _repository.AddAccountAsync(player);
     }
 
-    public async Task<string> LoginAsync(string playerId, string password)
+    public async Task<string?> LoginAsync(string playerId, string password)
     {
         var user = await _repository.GetByPlayerIdAsync(playerId);
         if (user == null) 
@@ -49,6 +49,16 @@ public class AccountService : IAccountService
         var sessionId = await _sessionService.CreateSessionAsync(user.Id);
         
         return sessionId;
+    }
+
+    public async Task<bool> LogoutAsync(string sessionId)
+    {
+        var isVaild = await _sessionService.ValidateSessionAsync(sessionId);
+        if (!isVaild)
+            return false;
+        
+        await _sessionService.DeleteSessionAsync(sessionId);
+        return true;
     }
 
     public async Task UpdateLastLoginAsync(int playerId)
