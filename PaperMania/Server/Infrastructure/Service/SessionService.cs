@@ -41,4 +41,13 @@ public class SessionService : ISessionService
     {
         await _cacheService.RemoveAsync(sessionId);
     }
+    
+    public async Task RefreshSessionAsync(string sessionId)
+    {
+        bool exists = await _cacheService.ExistsAsync(sessionId);
+        if (exists)
+        {
+            await _cacheService.SetExpirationAsync(sessionId, _sessionTimeout);
+        }
+    }
 }

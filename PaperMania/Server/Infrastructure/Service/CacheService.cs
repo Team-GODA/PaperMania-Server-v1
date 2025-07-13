@@ -32,4 +32,9 @@ public class CacheService : ICacheService
     {
         return await _db.KeyExistsAsync(key);
     }
+
+    public async Task SetExpirationAsync(string key, TimeSpan expiration)
+    {
+        await _db.KeyExpireAsync(key, expiration);
+    }
 }
