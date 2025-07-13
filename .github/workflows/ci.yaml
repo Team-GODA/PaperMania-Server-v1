@@ -21,22 +21,16 @@ jobs:
       - name: Show repo files
         run: ls -R
 
-      - name: Show files in PaperMania directory
-        run: ls -R PaperMania
-
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
       - name: Restore dependencies
-        working-directory: PaperMania
-        run: dotnet restore PaperMania.sln
+        run: dotnet restore PaperMania/PaperMania.sln
 
       - name: Build solution
-        working-directory: PaperMania
-        run: dotnet build PaperMania.sln --no-restore --configuration Release
+        run: dotnet build PaperMania/PaperMania.sln --no-restore --configuration Release
 
       - name: Run tests
-        working-directory: PaperMania
-        run: dotnet test PaperMania.sln --no-build --verbosity normal --configuration Release
+        run: dotnet test PaperMania/PaperMania.sln --no-build --verbosity normal --configuration Release
