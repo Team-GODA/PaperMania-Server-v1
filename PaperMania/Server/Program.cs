@@ -1,18 +1,25 @@
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Server.Application.Port;
+using Server.Infrastructure.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var keyVaultName = "papermaniadbconnection";
+var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+
+builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+
+builder.Services.AddScoped<IAccountRepository>(provider =>
+{
+    var connectionString = builder.Configuration["ConnectionString"];
+    return new AccountRepository(connectionString!);
+});
+
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
 
 app.UseHttpsRedirection();
 
