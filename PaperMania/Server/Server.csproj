@@ -12,7 +12,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controller\" />
+      <Folder Include="Api\Controller\" />
+      <Folder Include="Api\Dto\" />
+      <Folder Include="Application\Port\" />
+      <Folder Include="Application\Service\" />
+      <Folder Include="Domain\Entity\" />
+      <Folder Include="Infrastructure\Repository\" />
+      <Folder Include="Infrastructure\Service\" />
     </ItemGroup>
 
 </Project>
