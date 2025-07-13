@@ -30,8 +30,7 @@ public class SessionService : ISessionService
     
     private string GenerateSessionId()
     {
-        var bytes = RandomNumberGenerator.GetBytes(32);
-        return Convert.ToBase64String(bytes);
+        return Guid.NewGuid().ToString();
     }
 
     public async Task<bool> ValidateSessionAsync(string sessionId)
