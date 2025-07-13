@@ -5,12 +5,10 @@ namespace Server.Api.Middleware;
 public class SessionRefresh
 {
     private readonly RequestDelegate _next;
-    private readonly ISessionService _sessionService;
 
-    public SessionRefresh(RequestDelegate next, ISessionService sessionService)
+    public SessionRefresh(RequestDelegate next)
     {
         _next = next;
-        _sessionService = sessionService;
     }
     
     public async Task InvokeAsync(HttpContext context)
@@ -20,10 +18,12 @@ public class SessionRefresh
             var sessionId = sessionIds.FirstOrDefault();
             if (!string.IsNullOrEmpty(sessionId))
             {
-                bool valid = await _sessionService.ValidateSessionAsync(sessionId);
+                var sessionService = context.RequestServices.GetRequiredService<ISessionService>();
+                
+                bool valid = await sessionService.ValidateSessionAsync(sessionId);
                 if (valid)
                 {
-                    await _sessionService.RefreshSessionAsync(sessionId);
+                    await sessionService.RefreshSessionAsync(sessionId);
                 }
             }
         }
