@@ -12,7 +12,7 @@ builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential()
 
 builder.Services.AddScoped<IAccountRepository>(provider =>
 {
-    var connectionString = builder.Configuration["ConnectionString"];
+    var connectionString = builder.Configuration["AccountDbConnectionString"];
     return new AccountRepository(connectionString!);
 });
 
