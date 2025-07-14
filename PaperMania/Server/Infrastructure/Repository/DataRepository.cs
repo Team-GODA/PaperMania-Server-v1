@@ -26,17 +26,6 @@ public class DataRepository : IDataRepository
         return await _db.QueryFirstOrDefaultAsync<PlayerGameData>(sql, new { PlayerName = playerName });
     }
 
-    public async Task<bool> IsNewAccountAsync(int? userId)
-    {
-        var sql = @"
-            SELECT is_new_account AS IsNewAccount
-            FROM player_account_data
-            WHERE Id = @Id
-            LIMIT 1";
-        
-        return await _db.ExecuteScalarAsync<bool>(sql, new { Id = userId });
-    }
-
     public async Task AddPlayerNameAsync(string playerName)
     {
         var sql = @"
@@ -44,15 +33,5 @@ public class DataRepository : IDataRepository
             VALUES (@PlayerName)";
 
         await _db.ExecuteAsync(sql, new { PlayerName = playerName });
-    }
-
-    public async Task UpdateIsNewAccountAsync(int? userId, bool isNew = true)
-    {
-        var sql = @"
-            UPDATE player_account_data
-            SET is_new_account = @IsNew
-            WHERE id = @Id";
-
-        await _db.ExecuteAsync(sql, new { IsNew = isNew, Id = userId });
     }
 }

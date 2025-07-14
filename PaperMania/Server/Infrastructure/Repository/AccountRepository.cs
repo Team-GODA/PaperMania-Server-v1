@@ -53,4 +53,25 @@ public class AccountRepository : IAccountRepository
         var sql = @"UPDATE player_account_data SET last_login = NOW() WHERE id = @Id";
         await _db.ExecuteAsync(sql, new { Id = playerId });
     }
+    
+    public async Task<bool> IsNewAccountAsync(int? userId)
+    {
+        var sql = @"
+            SELECT is_new_account AS IsNewAccount
+            FROM player_account_data
+            WHERE Id = @Id
+            LIMIT 1";
+        
+        return await _db.ExecuteScalarAsync<bool>(sql, new { Id = userId });
+    }
+    
+    public async Task UpdateIsNewAccountAsync(int? userId, bool isNew = true)
+    {
+        var sql = @"
+            UPDATE player_account_data
+            SET is_new_account = @IsNew
+            WHERE id = @Id";
+
+        await _db.ExecuteAsync(sql, new { IsNew = isNew, Id = userId });
+    }
 }
