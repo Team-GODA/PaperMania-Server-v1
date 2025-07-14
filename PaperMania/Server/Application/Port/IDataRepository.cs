@@ -5,7 +5,7 @@ namespace Server.Application.Port;
 public interface IDataRepository
 {
     Task<PlayerGameData?> ExistsPlayerNameAsync(string playerName);
-    Task<string?> GetPlayerIdByPlayerNameAsync(string playerName);
+    Task<int?> GetUserIdByPlayerNameAsync(string playerName);
     Task<bool> IsNewAccountAsync(string playerId);
     Task AddPlayerNameAsync(string playerName);
     Task UpdateIsNewAccountAsync(string playerId, bool isNew = true);
