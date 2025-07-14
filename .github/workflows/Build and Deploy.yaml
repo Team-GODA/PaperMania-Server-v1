@@ -1,0 +1,51 @@
+name: Build and Deploy Test
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+
+    - name: Merge commit message
+      shell: pwsh
+      run: |
+        $message = git log -1 --pretty=%B
+        echo "message=$message" >> $env:GITHUB_OUTPUT
+      id: merge_message
+
+    - name: Build and Test
+      if: startsWith(steps.merge_message.outputs.message, 'Release')
+      run: |
+        cd CSharpTest
+        dotnet build CSharpTest.sln
+        dotnet test ./UnitTestProject1/UnitTestProject1.csproj
+
+    - name: Get Release Version
+      if: startsWith(steps.merge_message.outputs.message, 'Release') && success()
+      shell: pwsh
+      run: |
+        $version = ${{ steps.merge_message.outputs.message }} -replace 'Release ', ''
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+      id: extract_release_version
+
+    - name: Create release tag
+      if: startsWith(steps.merge_message.outputs.message, 'Release') && success()
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.extract_release_version.outputs.version }}
+        release_name: Release ${{ steps.extract_release_version.outputs.version }} v${{ github.run_number }}
+        body: ${{ steps.merge_message.outputs.message }}
+        draft: false
+        prerelease: false
