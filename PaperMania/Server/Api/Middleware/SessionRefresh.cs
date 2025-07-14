@@ -1,4 +1,4 @@
-﻿using Server.Infrastructure.Service.Interface;
+﻿using Server.Application.Port;
 
 namespace Server.Api.Middleware;
 
