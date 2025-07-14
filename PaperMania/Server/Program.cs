@@ -3,7 +3,6 @@ using Server.Api.Middleware;
 using Server.Application.Port;
 using Server.Infrastructure.Repository;
 using Server.Infrastructure.Service;
-using Server.Infrastructure.Service.Interface;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);

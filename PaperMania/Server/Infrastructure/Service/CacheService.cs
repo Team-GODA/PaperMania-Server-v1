@@ -1,4 +1,4 @@
-﻿using Server.Infrastructure.Service.Interface;
+﻿using Server.Application.Port;
 using StackExchange.Redis;
 
 namespace Server.Infrastructure.Service;

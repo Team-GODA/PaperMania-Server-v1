@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using Server.Infrastructure.Service.Interface;
+﻿using Server.Application.Port;
 
 namespace Server.Infrastructure.Service;
 
