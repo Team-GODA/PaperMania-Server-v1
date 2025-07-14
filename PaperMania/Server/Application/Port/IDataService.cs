@@ -2,6 +2,5 @@
 
 public interface IDataService
 {
-    public Task<string> AddPlayerNameAsync(string playerName);
-    public Task<bool> IsPlayerNewAccount(string playerName);
+    public Task<string> AddPlayerNameAsync(string playerName, string sessionId);
 }
