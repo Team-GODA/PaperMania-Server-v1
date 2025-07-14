@@ -36,15 +36,15 @@ public class DataRepository : IDataRepository
         return await _db.QueryFirstOrDefaultAsync<int?>(sql, new { PlayerName = playerName });
     }
 
-    public async Task<bool> IsNewAccountAsync(string playerId)
+    public async Task<bool> IsNewAccountAsync(int? userId)
     {
         var sql = @"
             SELECT is_new_account AS IsNewAccount
             FROM player_account_data
-            WHERE player_id = @PlayerId
+            WHERE Id = @Id
             LIMIT 1";
         
-        return await _db.ExecuteScalarAsync<bool>(sql, new { PlayerId = playerId });
+        return await _db.ExecuteScalarAsync<bool>(sql, new { Id = userId });
     }
 
     public async Task AddPlayerNameAsync(string playerName)
