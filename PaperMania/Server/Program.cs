@@ -18,6 +18,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped<IAccountRepository>(provider =>
     {
         var connectionString = builder.Configuration["AccountDbConnectionString"];
