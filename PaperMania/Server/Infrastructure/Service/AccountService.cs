@@ -1,6 +1,5 @@
 ﻿using Server.Application.Port;
 using Server.Domain.Entity;
-using Server.Infrastructure.Service.Interface;
 
 namespace Server.Infrastructure.Service;
 

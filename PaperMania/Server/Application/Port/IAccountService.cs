@@ -1,6 +1,6 @@
 ﻿using Server.Domain.Entity;
 
-namespace Server.Infrastructure.Service.Interface;
+namespace Server.Application.Port;
 
 public interface IAccountService
 {

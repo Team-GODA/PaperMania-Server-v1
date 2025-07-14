@@ -1,4 +1,4 @@
-﻿namespace Server.Infrastructure.Service.Interface;
+﻿namespace Server.Application.Port;
 
 public interface ICacheService
 {

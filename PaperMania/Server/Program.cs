@@ -3,7 +3,6 @@ using Server.Api.Middleware;
 using Server.Application.Port;
 using Server.Infrastructure.Repository;
 using Server.Infrastructure.Service;
-using Server.Infrastructure.Service.Interface;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,10 +19,15 @@ builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository>(provider =>
-{
-    var connectionString = builder.Configuration["AccountDbConnectionString"];
-    return new AccountRepository(connectionString!);
-});
+    {
+        var connectionString = builder.Configuration["AccountDbConnectionString"];
+        return new AccountRepository(connectionString!);
+    });
+builder.Services.AddScoped<IDataRepository>(provider =>
+    {
+        var connectionString = builder.Configuration["GameDataDbConnectionString"];
+        return new DataRepository(connectionString!);
+    });
 
 
 builder.Services.AddControllers();
