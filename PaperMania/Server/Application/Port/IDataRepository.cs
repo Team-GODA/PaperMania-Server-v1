@@ -8,5 +8,5 @@ public interface IDataRepository
     Task<int?> GetUserIdByPlayerNameAsync(string playerName);
     Task<bool> IsNewAccountAsync(int? userId);
     Task AddPlayerNameAsync(string playerName);
-    Task UpdateIsNewAccountAsync(string playerId, bool isNew = true);
+    Task UpdateIsNewAccountAsync(int? userId, bool isNew = true);
 }

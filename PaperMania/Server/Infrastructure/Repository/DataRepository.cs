@@ -56,13 +56,13 @@ public class DataRepository : IDataRepository
         await _db.ExecuteAsync(sql, new { PlayerName = playerName });
     }
 
-    public async Task UpdateIsNewAccountAsync(string playerId, bool isNew = true)
+    public async Task UpdateIsNewAccountAsync(int? userId, bool isNew = true)
     {
         var sql = @"
             UPDATE player_account_data
             SET is_new_account = @IsNew
-            WHERE player_id = @PlayerId";
+            WHERE id = @Id";
 
-        await _db.ExecuteAsync(sql, new { IsNew = isNew, PlayerId = playerId });
+        await _db.ExecuteAsync(sql, new { IsNew = isNew, Id = userId });
     }
 }
