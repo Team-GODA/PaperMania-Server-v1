@@ -18,7 +18,7 @@ namespace Server.Api.Controller
         }
 
         [HttpPost("name")]
-        public async Task<IActionResult> AddPlayerNameAsync(
+        public async Task<IActionResult> AddPlayerName(
             [FromHeader(Name = "Session-Id")] string sessionId,
             [FromBody] AddPlayerNameRequest request)
         {
@@ -26,6 +26,12 @@ namespace Server.Api.Controller
             
             try
             {
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    _logger.LogWarning("세션 Id가 없습니다. 매서드: AddPlayerName");
+                    return Conflict(new { message = "세션 ID가 없습니다." });
+                }
+                
                 var result = await _dataService.AddPlayerNameAsync(request.PlayerName, sessionId);
                 
                 _logger.LogInformation("플레이어 이름 등록 성공: PlayerName = {PlayerName}", request.PlayerName);
@@ -44,6 +50,42 @@ namespace Server.Api.Controller
             catch (Exception ex)
             {
                 _logger.LogError(ex, "서버 오류 발생: 플레이어 이름 등록 중 예외");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+        
+        [HttpGet("name/{id}")]
+        public async Task<IActionResult> GetPlayerName(
+            [FromHeader(Name = "Session-Id")] string sessionId,
+            int userId)
+        {
+            _logger.LogInformation($"플레이어 이름 조회 시도: Id: {userId}");
+
+            try
+            {
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    _logger.LogWarning("세션 Id가 없습니다. 매서드: GetPlayerName");
+                    return Conflict(new { message = "세션 ID가 없습니다." });
+                }
+
+                var player = await _dataService.GetByPlayerByIdAsync(userId);
+                if (player == null)
+                {
+                    _logger.LogWarning("해당 ID의 플레이어를 찾을 수 없습니다.");
+                    return NotFound(new { message = "해당 ID의 플레이어를 찾을 수 없습니다." });
+                }
+                
+                return Ok(new
+                {
+                    id = player.Id,
+                    playerId = player.PlayerId,
+                    playerName = player.PlayerName
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 이름 조회 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }
