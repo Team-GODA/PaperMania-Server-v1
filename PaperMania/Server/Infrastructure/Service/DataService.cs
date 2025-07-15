@@ -55,8 +55,8 @@ public class DataService : IDataService
         return await _dataRepository.GetPlayerNameByUserIdAsync(userId);
     }
 
-    public async Task<PlayerGameData?> GetByPlayerByIdAsync(string playerId)
+    public async Task<PlayerGameData?> GetByPlayerByIdAsync(int userId)
     {
-        return await _dataRepository.GetByPlayerByIdAsync(playerId);
+        return await _dataRepository.GetByPlayerByIdAsync(userId);
     }
 }
