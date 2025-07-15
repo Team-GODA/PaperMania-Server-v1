@@ -44,4 +44,13 @@ public class DataService : IDataService
         
         return playerName;
     }
+
+    public async Task<string> GetPlayerNameByUserIdAsync(int userId, string sessionId)
+    {
+        var isVaild = await _sessionService.ValidateSessionAsync(sessionId);
+        if (!isVaild)
+            throw new UnauthorizedAccessException("세션이 유효하지 않습니다.");
+        
+        return await _dataRepository.GetPlayerNameByUserIdAsync(userId);
+    }
 }
