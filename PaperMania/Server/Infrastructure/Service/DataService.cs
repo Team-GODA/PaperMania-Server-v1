@@ -1,4 +1,5 @@
 ﻿using Server.Application.Port;
+using Server.Domain.Entity;
 
 namespace Server.Infrastructure.Service;
 
@@ -52,5 +53,10 @@ public class DataService : IDataService
             throw new UnauthorizedAccessException("세션이 유효하지 않습니다.");
         
         return await _dataRepository.GetPlayerNameByUserIdAsync(userId);
+    }
+
+    public async Task<PlayerGameData?> GetByPlayerByIdAsync(string playerId)
+    {
+        return await _dataRepository.GetByPlayerByIdAsync(playerId);
     }
 }
