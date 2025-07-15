@@ -6,5 +6,5 @@ public interface IDataService
 {
     public Task<string> AddPlayerNameAsync(string playerName, string sessionId);
     public Task<string> GetPlayerNameByUserIdAsync(int userId, string sessionId);
-    public Task<PlayerGameData?> GetByPlayerByIdAsync(string playerId);
+    public Task<PlayerGameData?> GetByPlayerByIdAsync(int userId);
 }
