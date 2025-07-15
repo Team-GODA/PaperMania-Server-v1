@@ -34,4 +34,26 @@ public class DataRepository : IDataRepository
 
         await _db.ExecuteAsync(sql, new { PlayerName = playerName });
     }
+
+    public async Task<string> GetPlayerNameByUserIdAsync(int userId)
+    {
+        var sql = @"
+            SELECT player_name AS PlayerName
+            FROM player_game_data
+            WHERE id = @Id
+            ";
+        
+        return await _db.QueryFirstOrDefaultAsync<string>(sql, new { Id = userId });
+    }
+
+    public async Task<PlayerGameData?> GetByPlayerByIdAsync(int userId)
+    {
+        var sql = @"
+            SELECT id AS Id, player_name AS PlayerName, player_exp AS PlayerExp, player_level AS PlayerLevel
+            FROM player_game_data
+            WHERE id = @Id
+            LIMIT 1";
+        
+        return await _db.QueryFirstOrDefaultAsync<PlayerGameData>(sql, new { Id = userId });
+    }
 }
