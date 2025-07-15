@@ -57,7 +57,7 @@ namespace Server.Api.Controller
         [HttpGet("name/{id}")]
         public async Task<IActionResult> GetPlayerName(
             [FromHeader(Name = "Session-Id")] string sessionId,
-            int userId)
+            [FromRoute(Name = "id")]int userId)
         {
             _logger.LogInformation($"플레이어 이름 조회 시도: Id: {userId}");
 
@@ -79,7 +79,6 @@ namespace Server.Api.Controller
                 return Ok(new
                 {
                     id = player.Id,
-                    playerId = player.PlayerId,
                     playerName = player.PlayerName
                 });
             }

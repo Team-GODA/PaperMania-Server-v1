@@ -49,10 +49,9 @@ public class DataRepository : IDataRepository
     public async Task<PlayerGameData?> GetByPlayerByIdAsync(int userId)
     {
         var sql = @"
-            SELECT G.id AS Id, G.player_name AS PlayerName, G.player_exp AS PlayerExp, G.player_level AS PlayerLevel, A.player_id AS PlayerId, A.role AS Role
-            FROM player_game_data G
-            JOIN player_account_data A ON G.id = A.id
-            WHERE G.id = @Id
+            SELECT id AS Id, player_name AS PlayerName, player_exp AS PlayerExp, player_level AS PlayerLevel
+            FROM player_game_data
+            WHERE id = @Id
             LIMIT 1";
         
         return await _db.QueryFirstOrDefaultAsync<PlayerGameData>(sql, new { Id = userId });
