@@ -29,7 +29,7 @@ namespace Server.Api.Controller
                 if (string.IsNullOrEmpty(sessionId))
                 {
                     _logger.LogWarning("세션 Id가 없습니다. 매서드: AddPlayerName");
-                    return Conflict(new { message = "세션 ID가 없습니다." });
+                    return Unauthorized(new { message = "세션 ID가 없습니다." });
                 }
                 
                 var result = await _dataService.AddPlayerNameAsync(request.PlayerName, sessionId);
@@ -55,7 +55,7 @@ namespace Server.Api.Controller
         }
         
         [HttpGet("name/{id}")]
-        public async Task<IActionResult> GetPlayerName(
+        public async Task<IActionResult> GetPlayerNameById(
             [FromHeader(Name = "Session-Id")] string sessionId,
             [FromRoute(Name = "id")]int userId)
         {
@@ -66,20 +66,51 @@ namespace Server.Api.Controller
                 if (string.IsNullOrEmpty(sessionId))
                 {
                     _logger.LogWarning("세션 Id가 없습니다. 매서드: GetPlayerName");
-                    return Conflict(new { message = "세션 ID가 없습니다." });
+                    return Unauthorized(new { message = "세션 ID가 없습니다." });
                 }
 
-                var player = await _dataService.GetByPlayerByIdAsync(userId);
-                if (player == null)
-                {
-                    _logger.LogWarning("해당 ID의 플레이어를 찾을 수 없습니다.");
-                    return NotFound(new { message = "해당 ID의 플레이어를 찾을 수 없습니다." });
-                }
+                var id = userId;
+                var playerName = await _dataService.GetPlayerNameByUserIdAsync(userId, sessionId);
                 
+                _logger.LogInformation($"플레이어 이름 조회 성공: PlayerName: {playerName}");
                 return Ok(new
                 {
-                    id = player.Id,
-                    playerName = player.PlayerName
+                    id,
+                    playerName
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 이름 조회 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpGet("level/{id}")]
+        public async Task<IActionResult> GetPlayerLevelById(
+            [FromHeader(Name = "Session-Id")] string sessionId,
+            [FromRoute(Name = "id")] int userId)
+        {
+            _logger.LogInformation($"플레이어 레벨 조회 시도: Id: {userId}");
+
+            try
+            {
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    _logger.LogWarning("세션 Id가 없습니다. 매서드: GetPlayerName");
+                    return Unauthorized(new { message = "세션 ID가 없습니다." });
+                }
+
+                var id = userId;
+                var level = await _dataService.GetPlayerLevelByUserIdAsync(userId, sessionId);
+                var exp = await _dataService.GetPlayerExpByUserIdAsync(userId, sessionId);
+                
+                _logger.LogInformation($"플레이어 레벨 조회 성공: PlayerLevel: {level}");
+                return Ok(new
+                {
+                    id,
+                    level,
+                    exp
                 });
             }
             catch (Exception ex)
