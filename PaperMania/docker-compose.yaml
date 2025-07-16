@@ -22,7 +22,7 @@ services:
       - RedisConnectionString=redis:6379,abortConnect=false
       - AccountDbConnectionString=Host=db;Port=5432;Username=PaperMania;Password=${ACCOUNT_DB_PASSWORD};Database=paper_mania_account_data
       - GameDataDbConnectionString=Host=db;Port=5432;Username=PaperMania;Password=${GAMEDATA_DB_PASSWORD};Database=paper_mania_game_data
-
+  
   redis:
     image: redis:7.2
     container_name: redis

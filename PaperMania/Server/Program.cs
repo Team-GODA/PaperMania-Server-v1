@@ -12,7 +12,11 @@ var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
 
 builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
-var redisConnectionString = builder.Configuration["RedisConnectionString"] ?? "redis:6379,abortConnect=false";
+var env = builder.Environment;
+
+var redisConnectionString = env.IsDevelopment()
+    ? "localhost:6379"
+    : "redis:6379,abortConnect=false";
 var redis = ConnectionMultiplexer.Connect(redisConnectionString);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
@@ -23,12 +27,20 @@ builder.Services.AddScoped<IDataService, DataService>();
 
 builder.Services.AddScoped<IAccountRepository>(provider =>
 {
-    var connectionString = builder.Configuration["AccountDbConnectionString"];
+    var config = provider.GetRequiredService<IConfiguration>();
+
+    var keyName = env.IsDevelopment() ? "AccountDbConnectionString-local" : "AccountDbConnectionString";
+    var connectionString = config[keyName];
+
     return new AccountRepository(connectionString!);
 });
 builder.Services.AddScoped<IDataRepository>(provider =>
 {
-    var connectionString = builder.Configuration["GameDataDbConnectionString"];
+    var config = provider.GetRequiredService<IConfiguration>();
+
+    var keyName = env.IsDevelopment() ? "GameDataDbConnectionString-local" : "GameDataDbConnectionString";
+    var connectionString = config[keyName];
+
     return new DataRepository(connectionString!);
 });
 
