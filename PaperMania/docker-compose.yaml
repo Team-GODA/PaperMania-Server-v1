@@ -3,16 +3,25 @@
 services:
   server:
     build:
-      context: .
+      context: ./Server
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8085:8080"
+    env_file:
+      - .env
     depends_on:
       - redis
+      - db
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - REDIS__HOST=redis
       - REDIS__PORT=6379
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - RedisConnectionString=redis:6379,abortConnect=false
+      - AccountDbConnectionString=Host=db;Port=5432;Username=PaperMania;Password=${ACCOUNT_DB_PASSWORD};Database=paper_mania_account_data
+      - GameDataDbConnectionString=Host=db;Port=5432;Username=PaperMania;Password=${GAMEDATA_DB_PASSWORD};Database=paper_mania_game_data
 
   redis:
     image: redis:7.2
@@ -22,5 +31,18 @@ services:
     volumes:
       - redis-data:/data
 
+  db:
+    image: postgres:15
+    container_name: db
+    environment:
+      POSTGRES_USER: PaperMania
+      POSTGRES_PASSWORD: ${ACCOUNT_DB_PASSWORD}
+      POSTGRES_DB: paper_mania_account_data
+    ports:
+      - "5440:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
 volumes:
   redis-data:
+  pgdata:

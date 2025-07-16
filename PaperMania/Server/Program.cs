@@ -12,7 +12,8 @@ var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
 
 builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
-var redis = ConnectionMultiplexer.Connect("localhost:6379");
+var redisConnectionString = builder.Configuration["RedisConnectionString"] ?? "redis:6379,abortConnect=false";
+var redis = ConnectionMultiplexer.Connect(redisConnectionString);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
 builder.Services.AddScoped<ICacheService, CacheService>();
