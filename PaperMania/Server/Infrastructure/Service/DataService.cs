@@ -54,7 +54,7 @@ public class DataService : IDataService
 
     public async Task<PlayerGameData?> GetByPlayerByIdAsync(int userId)
     {
-        return await _dataRepository.GetByPlayerByIdAsync(userId);
+        return await _dataRepository.GetPlayerDataByIdAsync(userId);
     }
 
     public async Task<int> GetPlayerLevelByUserIdAsync(int userId, string sessionId)
@@ -82,7 +82,7 @@ public class DataService : IDataService
 
     private async Task<PlayerGameData> GetPlayerDataByUserId(int userId)
     {
-        var data = await _dataRepository.GetByPlayerByIdAsync(userId);
+        var data = await _dataRepository.GetPlayerDataByIdAsync(userId);
         if (data == null)
             throw new Exception($"Id: {userId}의 플레이어 데이터가 없습니다.");
 
