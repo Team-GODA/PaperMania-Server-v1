@@ -73,6 +73,16 @@ public class DataService : IDataService
         return data.PlayerExp;
     }
 
+    public async Task<PlayerGameData> UpdatePlayerLevelAsync(int userId, int level, int exp, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        var data = await _dataRepository.UpdatePlayerLevelAsync(userId, level, exp);
+        if (data == null)
+            throw new Exception($"Id: {userId}의 플레이어 레벨 데이터가 없습니다.");
+
+        return data;
+    }
+
     private async Task ValidateSessionAsync(string sessionId)
     {
         var isValid = await _sessionService.ValidateSessionAsync(sessionId);
