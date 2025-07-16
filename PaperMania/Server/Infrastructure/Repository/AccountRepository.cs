@@ -6,17 +6,17 @@ using Server.Domain.Entity;
 
 namespace Server.Infrastructure.Repository;
 
-public class AccountRepository : IAccountRepository
+public class AccountRepository : RepositoryBase, IAccountRepository
 {
-    private readonly IDbConnection _db;
-
-    public AccountRepository(string connectionString)
+    public AccountRepository(IDbConnection db, ILogger<AccountRepository> logger)
+        : base(db, logger)
     {
-        _db = new NpgsqlConnection(connectionString);
     }
-    
+
     public async Task<PlayerAccountData?> GetByPlayerIdAsync(string playerId)
     {
+        await CheckConnectionOpenAsync();
+        
         var sql = @"
             SELECT id, player_id AS PlayerId, email, password, is_new_account AS IsNewAccount,
                    role AS Role, created_at AS CreatedAt, last_login AS LastLogin
@@ -29,6 +29,8 @@ public class AccountRepository : IAccountRepository
 
     public async Task<PlayerAccountData?> GetByEmailAsync(string email)
     {
+        await CheckConnectionOpenAsync();
+        
         var sql = @"
             SELECT id, player_id AS PlayerId, email, password, is_new_account AS IsNewAccount,
                    role AS Role, created_at AS CreatedAt, last_login AS LastLogin
@@ -41,6 +43,8 @@ public class AccountRepository : IAccountRepository
 
     public async Task AddAccountAsync(PlayerAccountData player)
     {
+        await CheckConnectionOpenAsync();
+        
         var sql = @"
             INSERT INTO player_account_data (player_id, email, password, is_new_account, role)
             VALUES (@PlayerId, @Email, @Password, @IsNewAccount, @Role)";
@@ -50,12 +54,16 @@ public class AccountRepository : IAccountRepository
 
     public async Task UpdateLastLoginAsync(int playerId)
     {
+        await CheckConnectionOpenAsync();
+        
         var sql = @"UPDATE player_account_data SET last_login = NOW() WHERE id = @Id";
         await _db.ExecuteAsync(sql, new { Id = playerId });
     }
     
     public async Task<bool> IsNewAccountAsync(int? userId)
     {
+        await CheckConnectionOpenAsync();
+        
         var sql = @"
             SELECT is_new_account AS IsNewAccount
             FROM player_account_data
@@ -67,6 +75,8 @@ public class AccountRepository : IAccountRepository
     
     public async Task UpdateIsNewAccountAsync(int? userId, bool isNew = true)
     {
+        await CheckConnectionOpenAsync();
+        
         var sql = @"
             UPDATE player_account_data
             SET is_new_account = @IsNew

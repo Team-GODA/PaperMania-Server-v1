@@ -1,6 +1,9 @@
+using System.Data;
 using Azure.Identity;
+using Npgsql;
 using Server.Api.Middleware;
 using Server.Application.Port;
+using Server.Infrastructure.Persistence;
 using Server.Infrastructure.Repository;
 using Server.Infrastructure.Service;
 using StackExchange.Redis;
@@ -19,16 +22,22 @@ builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDataService, DataService>();
-builder.Services.AddScoped<IAccountRepository>(provider =>
+
+builder.Services.AddScoped<IAccountDbConnection>(provider =>
+{
+    var config = provider.GetRequiredService<IConfiguration>();
+    var connectionString = config["AccountDbConnection"];
+    return new AccountDbConnection(connectionString!);
+});
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+
+builder.Services.AddScoped<IGameDbConnection>(provider =>
     {
-        var connectionString = builder.Configuration["AccountDbConnectionString"];
-        return new AccountRepository(connectionString!);
+        var configuration = provider.GetRequiredService<IConfiguration>();
+        var connectionString = configuration["GameDataDbConnectionString"];
+        return new GameDbConnection(connectionString!);
     });
-builder.Services.AddScoped<IDataRepository>(provider =>
-    {
-        var connectionString = builder.Configuration["GameDataDbConnectionString"];
-        return new DataRepository(connectionString!);
-    });
+builder.Services.AddScoped<IDataRepository, DataRepository>();
 
 
 builder.Services.AddControllers();
