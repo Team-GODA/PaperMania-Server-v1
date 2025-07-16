@@ -20,9 +20,7 @@ public class DataService : IDataService
     
     public async Task<string> AddPlayerNameAsync(string playerName, string sessionId)
     {
-        var isVaild = await _sessionService.ValidateSessionAsync(sessionId);
-        if (!isVaild)
-            throw new UnauthorizedAccessException("세션이 유효하지 않습니다.");
+        await ValidateSessionAsync(sessionId);
         
         var exists = await _dataRepository.ExistsPlayerNameAsync(playerName);
         if (exists != null)
@@ -46,17 +44,48 @@ public class DataService : IDataService
         return playerName;
     }
 
-    public async Task<string> GetPlayerNameByUserIdAsync(int userId, string sessionId)
+    public async Task<string?> GetPlayerNameByUserIdAsync(int userId, string sessionId)
     {
-        var isVaild = await _sessionService.ValidateSessionAsync(sessionId);
-        if (!isVaild)
-            throw new UnauthorizedAccessException("세션이 유효하지 않습니다.");
-        
-        return await _dataRepository.GetPlayerNameByUserIdAsync(userId);
+        await ValidateSessionAsync(sessionId);
+        var data = await GetByPlayerByIdAsync(userId);
+
+        return data?.PlayerName;
     }
 
     public async Task<PlayerGameData?> GetByPlayerByIdAsync(int userId)
     {
         return await _dataRepository.GetByPlayerByIdAsync(userId);
+    }
+
+    public async Task<int> GetPlayerLevelByUserIdAsync(int userId, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        var data = await GetPlayerDataByUserId(userId);
+
+        return data.PlayerLevel;
+    }
+
+    public async Task<int> GetPlayerExpByUserIdAsync(int userId, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        var data = await GetPlayerDataByUserId(userId);
+
+        return data.PlayerExp;
+    }
+
+    private async Task ValidateSessionAsync(string sessionId)
+    {
+        var isValid = await _sessionService.ValidateSessionAsync(sessionId);
+        if (!isValid)
+            throw new UnauthorizedAccessException("세션이 유효하지 않습니다.");
+    }
+
+    private async Task<PlayerGameData> GetPlayerDataByUserId(int userId)
+    {
+        var data = await _dataRepository.GetByPlayerByIdAsync(userId);
+        if (data == null)
+            throw new Exception($"Id: {userId}의 플레이어 데이터가 없습니다.");
+
+        return data;
     }
 }

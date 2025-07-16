@@ -4,7 +4,9 @@ namespace Server.Application.Port;
 
 public interface IDataService
 {
-    public Task<string> AddPlayerNameAsync(string playerName, string sessionId);
-    public Task<string> GetPlayerNameByUserIdAsync(int userId, string sessionId);
-    public Task<PlayerGameData?> GetByPlayerByIdAsync(int userId);
+    Task<string> AddPlayerNameAsync(string playerName, string sessionId);
+    Task<string?> GetPlayerNameByUserIdAsync(int userId, string sessionId);
+    Task<PlayerGameData?> GetByPlayerByIdAsync(int userId);
+    Task<int> GetPlayerLevelByUserIdAsync(int userId, string sessionId);
+    Task<int> GetPlayerExpByUserIdAsync(int userId, string sessionId);
 }
