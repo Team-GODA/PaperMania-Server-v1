@@ -17,6 +17,16 @@ namespace Server.Api.Controller
             _logger = logger;
         }
 
+        private bool CheckSessionId(string sessionId)
+        {
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                _logger.LogWarning("세션 Id가 없습니다.");
+                return false;
+            }
+            return true;
+        }
+
         [HttpPost("name")]
         public async Task<IActionResult> AddPlayerName(
             [FromHeader(Name = "Session-Id")] string sessionId,
@@ -24,15 +34,12 @@ namespace Server.Api.Controller
         {
             _logger.LogInformation($"플레이어 이름 등록 시도: PlayerName = {request.PlayerName}");
             
+            if (!CheckSessionId(sessionId))
+                return Unauthorized(new { message = "세션 ID가 없습니다." });
+
             try
             {
-                if (string.IsNullOrEmpty(sessionId))
-                {
-                    _logger.LogWarning("세션 Id가 없습니다. 매서드: AddPlayerName");
-                    return Unauthorized(new { message = "세션 ID가 없습니다." });
-                }
-                
-                var result = await _dataService.AddPlayerNameAsync(request.PlayerName, sessionId);
+                 var result = await _dataService.AddPlayerNameAsync(request.PlayerName, sessionId);
                 
                 _logger.LogInformation("플레이어 이름 등록 성공: PlayerName = {PlayerName}", request.PlayerName);
                 return Created(string.Empty, new { message = "이름이 성공적으로 설정되었습니다." });
@@ -61,15 +68,12 @@ namespace Server.Api.Controller
         {
             _logger.LogInformation($"플레이어 이름 조회 시도: Id: {userId}");
 
+            if (!CheckSessionId(sessionId))
+                return Unauthorized(new { message = "세션 ID가 없습니다." });
+
             try
             {
-                if (string.IsNullOrEmpty(sessionId))
-                {
-                    _logger.LogWarning("세션 Id가 없습니다. 매서드: GetPlayerName");
-                    return Unauthorized(new { message = "세션 ID가 없습니다." });
-                }
-
-                var id = userId;
+                 var id = userId;
                 var playerName = await _dataService.GetPlayerNameByUserIdAsync(userId, sessionId);
                 
                 _logger.LogInformation($"플레이어 이름 조회 성공: PlayerName: {playerName}");
@@ -93,14 +97,11 @@ namespace Server.Api.Controller
         {
             _logger.LogInformation($"플레이어 레벨 조회 시도: Id: {userId}");
 
+            if (!CheckSessionId(sessionId))
+                return Unauthorized(new { message = "세션 ID가 없습니다." });
+
             try
             {
-                if (string.IsNullOrEmpty(sessionId))
-                {
-                    _logger.LogWarning("세션 Id가 없습니다. 매서드: GetPlayerName");
-                    return Unauthorized(new { message = "세션 ID가 없습니다." });
-                }
-
                 var id = userId;
                 var level = await _dataService.GetPlayerLevelByUserIdAsync(userId, sessionId);
                 var exp = await _dataService.GetPlayerExpByUserIdAsync(userId, sessionId);
@@ -111,6 +112,40 @@ namespace Server.Api.Controller
                     id,
                     level,
                     exp
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 이름 조회 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpPost("level/{id}")]
+        public async Task<IActionResult> UpdatePlayerLevel(
+            [FromHeader(Name = "Session-Id")] string sessionId,
+            [FromRoute(Name = "id")] int userId,
+            [FromBody] UpdatePlayerLevelRequest request)
+        {
+            _logger.LogInformation($"플레이어 레벨 갱신 시도: Id: {userId}, 갱신 레벨: {request.NewLevel}, 갱신 Exp: {request.NewExp}");
+
+            if (!CheckSessionId(sessionId))
+                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            
+            try
+            {
+                var data =
+                    await _dataService.UpdatePlayerLevelAsync(userId, request.NewLevel, request.NewExp, sessionId);
+
+                var newLevel = data.PlayerLevel;
+                var newExp = data.PlayerExp;
+                
+                _logger.LogInformation($"플레이어 레벨 갱신 성공: Id: {userId}, 갱신 레벨: {request.NewLevel}, 갱신 Exp: {request.NewExp}");
+                return Ok(new
+                {
+                    userId,
+                    newLevel,
+                    newExp
                 });
             }
             catch (Exception ex)

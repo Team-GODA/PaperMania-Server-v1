@@ -6,5 +6,6 @@ public interface IDataRepository
 {
     Task<PlayerGameData?> ExistsPlayerNameAsync(string playerName);
     Task AddPlayerNameAsync(string playerName);
-    Task<PlayerGameData?> GetByPlayerByIdAsync(int userId);
+    Task<PlayerGameData?> GetPlayerDataByIdAsync(int userId);
+    Task<PlayerGameData?> UpdatePlayerLevelAsync(int userId, int newLevel, int newExp);
 }
