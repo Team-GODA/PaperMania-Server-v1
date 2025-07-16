@@ -1,5 +1,4 @@
-﻿# 베이스 이미지 (실행 환경)
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 
 ARG APP_UID=1000
 USER $APP_UID
@@ -9,12 +8,12 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
+WORKDIR /src/Server
 
-COPY ["Server.csproj", "./"]
+COPY Server/Server.csproj ./
 RUN dotnet restore "Server.csproj"
 
-COPY . .
+COPY PaperMania/Server/. ./
 
 RUN dotnet build "Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
