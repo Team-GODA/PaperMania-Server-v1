@@ -4,42 +4,43 @@ on:
   push:
     branches:
       - 'main'
+      - 'release'
 
 jobs:
   build:
     runs-on: windows-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
 
     - name: Merge commit message
+      id: merge_message
       shell: pwsh
       run: |
         $message = git log -1 --pretty=%B
-        echo "message=$message" >> $env:GITHUB_OUTPUT
-      id: merge_message
+        Write-Output "message=$message" >> $env:GITHUB_OUTPUT
 
     - name: Build and Test
-      if: startsWith(steps.merge_message.outputs.message, 'Release')
+      if: ${{ startsWith(steps.merge_message.outputs.message, 'Release') }}
       run: |
         cd CSharpTest
         dotnet build CSharpTest.sln
         dotnet test ./UnitTestProject1/UnitTestProject1.csproj
 
     - name: Get Release Version
-      if: startsWith(steps.merge_message.outputs.message, 'Release') && success()
+      id: extract_release_version
+      if: ${{ startsWith(steps.merge_message.outputs.message, 'Release') }}
       shell: pwsh
       run: |
-        $version = ${{ steps.merge_message.outputs.message }} -replace 'Release ', ''
-        echo "version=$version" >> $env:GITHUB_OUTPUT
-      id: extract_release_version
+        $version = "${{ steps.merge_message.outputs.message }}" -replace 'Release ', ''
+        Write-Output "version=$version" >> $env:GITHUB_OUTPUT
 
     - name: Create release tag
-      if: startsWith(steps.merge_message.outputs.message, 'Release') && success()
+      if: ${{ startsWith(steps.merge_message.outputs.message, 'Release') }}
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
