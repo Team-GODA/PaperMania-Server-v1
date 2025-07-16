@@ -1,7 +1,6 @@
 using Azure.Identity;
 using Server.Api.Middleware;
 using Server.Application.Port;
-using Server.Infrastructure.Persistence;
 using Server.Infrastructure.Repository;
 using Server.Infrastructure.Service;
 using StackExchange.Redis;
