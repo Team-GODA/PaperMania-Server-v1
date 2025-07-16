@@ -3,12 +3,13 @@ using Dapper;
 using Npgsql;
 using Server.Application.Port;
 using Server.Domain.Entity;
+using Server.Infrastructure.Persistence;
 
 namespace Server.Infrastructure.Repository;
 
 public class AccountRepository : RepositoryBase, IAccountRepository
 {
-    public AccountRepository(IDbConnection db, ILogger<AccountRepository> logger)
+    public AccountRepository(IAccountDbConnection db, ILogger<AccountRepository> logger)
         : base(db, logger)
     {
     }

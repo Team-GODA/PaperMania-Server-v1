@@ -1,6 +1,4 @@
-using System.Data;
 using Azure.Identity;
-using Npgsql;
 using Server.Api.Middleware;
 using Server.Application.Port;
 using Server.Infrastructure.Persistence;
