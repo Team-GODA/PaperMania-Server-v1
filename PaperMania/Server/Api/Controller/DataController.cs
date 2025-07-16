@@ -72,6 +72,7 @@ namespace Server.Api.Controller
                 var id = userId;
                 var playerName = await _dataService.GetPlayerNameByUserIdAsync(userId, sessionId);
                 
+                _logger.LogInformation($"플레이어 이름 조회 성공: PlayerName: {playerName}");
                 return Ok(new
                 {
                     id,
@@ -101,12 +102,15 @@ namespace Server.Api.Controller
                 }
 
                 var id = userId;
-                var playerLevel = await _dataService.GetPlayerLevelByUserIdAsync(userId, sessionId);
+                var level = await _dataService.GetPlayerLevelByUserIdAsync(userId, sessionId);
+                var exp = await _dataService.GetPlayerExpByUserIdAsync(userId, sessionId);
                 
+                _logger.LogInformation($"플레이어 레벨 조회 성공: PlayerLevel: {level}");
                 return Ok(new
                 {
                     id,
-                    playerLevel
+                    level,
+                    exp
                 });
             }
             catch (Exception ex)
