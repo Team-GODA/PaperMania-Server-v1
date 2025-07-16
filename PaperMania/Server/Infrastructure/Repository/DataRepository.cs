@@ -45,4 +45,21 @@ public class DataRepository : IDataRepository
         
         return await _db.QueryFirstOrDefaultAsync<PlayerGameData>(sql, new { Id = userId });
     }
+
+    public async Task<PlayerGameData?> UpdatePlayerLevelAsync(int userId, int newLevel, int newExp)
+    {
+        var sql = @"
+            UPDATE player_game_data
+            SET player_level = @Level, player_exp = @Exp
+            WHERE id = @Id
+            RETURNING id, player_name AS PlayerName, player_exp AS PlayerExp, player_level AS PlayerLevel;
+            ";
+
+        return await _db.QueryFirstOrDefaultAsync<PlayerGameData>(sql, new
+        {
+            Level = newLevel,
+            Exp = newExp,
+            Id = userId
+        });
+    }
 }
