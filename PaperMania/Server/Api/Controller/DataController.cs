@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Application.Port;
+using System.Linq;
+using Server.Domain.Entity;
 
 namespace Server.Api.Controller
 {
@@ -151,6 +153,60 @@ namespace Server.Api.Controller
             catch (Exception ex)
             {
                 _logger.LogError(ex, "플레이어 이름 조회 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpGet("character/{id}")]
+        public async Task<IActionResult> GetPlayerCharacterById(
+            [FromHeader(Name = "Session-Id")] string sessionId,
+            [FromRoute(Name = "id")] int userId)
+        {
+            _logger.LogInformation($"플레이어 보유 캐릭터 데이터 조회 시도: ID: {userId}");
+
+            if (!CheckSessionId(sessionId))
+                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            
+            try
+            {
+                var data = await _dataService.GetPlayerCharacterDataByUserIdAsync(userId, sessionId);
+
+                _logger.LogInformation($"플레이어 보유 캐릭터 데이터 조회 성공: ID: {userId}");
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 보유 캐릭터 조회 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpPost("character")]
+        public async Task<IActionResult> AddPlayerCharacterById(
+            [FromHeader(Name = "Session-Id")] string sessionId,
+            [FromBody] AddPlayerCharacterRequest request)
+        {
+            _logger.LogInformation($"플레이어 보유 캐릭터 추가 시도: Id: {request.Id}, CharacterId: {request.CharacterId}");
+
+            if (!CheckSessionId(sessionId))
+                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            
+            try
+            {
+                var data = new PlayerCharacterData
+                {
+                    Id = request.Id,
+                    CharacterId = request.CharacterId
+                };
+
+                var addedCharacter = await _dataService.AddPlayerCharacterDataByUserIdAsync(data, sessionId);
+                
+                _logger.LogInformation($"플레이어 보유 캐릭터 추가 성공: Id: {request.Id}, CharacterId: {request.CharacterId}");
+                return Ok(addedCharacter);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 캐릭터 추가 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }

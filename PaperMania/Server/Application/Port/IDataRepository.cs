@@ -8,4 +8,7 @@ public interface IDataRepository
     Task AddPlayerNameAsync(string playerName);
     Task<PlayerGameData?> GetPlayerDataByIdAsync(int userId);
     Task<PlayerGameData?> UpdatePlayerLevelAsync(int userId, int newLevel, int newExp);
+    Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int userId);
+    Task<PlayerCharacterData> AddPlayerCharacterDataByUserIdAsync(PlayerCharacterData data);
+    Task<bool> IsNewCharacterExistAsync(int userId, string characterId);
 }
