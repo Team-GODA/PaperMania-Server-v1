@@ -89,6 +89,12 @@ public class DataService : IDataService
         return await _dataRepository.GetPlayerCharacterDataByUserIdAsync(userId);
     }
 
+    public async Task<PlayerCharacterData> AddPlayerCharacterDataByUserIdAsync(int userId, PlayerCharacterData data, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        return await _dataRepository.AddPlayerCharacterDataByUserIdAsync(userId, data);
+    }
+
     private async Task ValidateSessionAsync(string sessionId)
     {
         var isValid = await _sessionService.ValidateSessionAsync(sessionId);
