@@ -104,7 +104,7 @@ namespace Server.Api.Controller
                 var sessionId = await _accountService.LoginByGoogleAsync(request.IdToken);
                 if (string.IsNullOrEmpty(sessionId))
                 {
-                    _logger.LogWarning("구글 로그인 실패}");
+                    _logger.LogWarning("구글 로그인 실패");
                     return Unauthorized(new { message = "구글 로그인 실패." });
                 }
 
