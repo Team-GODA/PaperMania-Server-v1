@@ -97,21 +97,21 @@ namespace Server.Api.Controller
         [HttpPost("login/google")]
         public async Task<ActionResult<GoogleLoginResponse>> LoginByGoogle([FromBody] GoogleLoginRequest request)
         {
-            _logger.LogInformation($"구글 로그인 시도: PlayerId = {request.PlayerId}");
+            _logger.LogInformation("구글 로그인 시도");
 
             try
             {
                 var sessionId = await _accountService.LoginByGoogleAsync(request.IdToken);
                 if (string.IsNullOrEmpty(sessionId))
                 {
-                    _logger.LogWarning("구글 로그인 실패: PlayerId={PlayerId}", request.PlayerId);
+                    _logger.LogWarning("구글 로그인 실패}");
                     return Unauthorized(new { message = "구글 로그인 실패." });
                 }
 
                 var response = new GoogleLoginResponse
                 {
                     SessionId = sessionId,
-                    Message = $"구글 로그인 성공: PlayerId = {request.PlayerId}"
+                    Message = $"구글 로그인 성공"
                 };
 
                 return Ok(response);
