@@ -66,9 +66,11 @@ public class DataRepository : IDataRepository
     public async Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int userId)
     {
         var sql = @"
-            SELECT id AS Id, character_id AS CharacterId, character_level AS CharacterLevel
-            FROM player_character_data
-            WHERE id = @Id
+            SELECT P.id AS Id, P.character_id AS CharacterId, P.character_level AS CharacterLevel,
+                   C.character_name AS CharacterName, C.rarity  AS RarityString
+            FROM player_character_data P
+            JOIN character_data C ON P.character_id = C.character_id
+            WHERE P.id = @Id
             ";
 
         var result = await _db.QueryAsync<PlayerCharacterData>(sql, new { Id = userId });
