@@ -10,10 +10,10 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY PaperMania/Server/Server.csproj ./
+COPY Server.csproj ./
 RUN dotnet restore "Server.csproj"
 
-COPY PaperMania/Server/. ./
+COPY . ./
 
 RUN dotnet build "Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
