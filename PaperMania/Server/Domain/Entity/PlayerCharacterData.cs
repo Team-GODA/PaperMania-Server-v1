@@ -15,3 +15,10 @@ public class PlayerCharacterData
     [System.Text.Json.Serialization.JsonIgnore]
     public Rarity Rarity { get; set; }
 }
+
+public enum Rarity
+{
+    Common,
+    Rare,
+    Epic
+}
