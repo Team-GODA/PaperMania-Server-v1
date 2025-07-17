@@ -77,4 +77,34 @@ public class DataRepository : IDataRepository
         var result = (await _db.QueryAsync<PlayerCharacterData>(sql, new { Id = userId })).ToList();
         return result;
     }
+
+    public async Task<PlayerCharacterData> AddPlayerCharacterDataByUserIdAsync(int userId, PlayerCharacterData data)
+    {
+        var sql = @"
+            INSERT INTO player_character_data 
+            (user_id, character_id, character_name, character_level, normal_skill_level, epic_skill_level, rarity)
+            VALUES 
+            (@UserId, @CharacterId, @CharacterName, @CharacterLevel, @NormalSkillLevel, @EpicSkillLevel, @RarityString);
+            ";
+        
+        var param = new
+        {
+            data.CharacterId,
+            data.CharacterName,
+            data.CharacterLevel,
+            data.NormalSkillLevel,
+            data.EpicSkillLevel,
+            data.RarityString,
+            data.Id,
+            UserId = userId
+        };
+        
+        await _db.ExecuteAsync(sql, param);
+
+        var result = await _db.QuerySingleAsync<PlayerCharacterData>(
+            "SELECT * FROM player_character_data WHERE id = @Id AND user_id = @UserId",
+            new { data.Id, UserId = userId });
+        
+        return result;
+    }
 }
