@@ -166,10 +166,9 @@ namespace Server.Api.Controller
             try
             {
                 var data = await _dataService.GetPlayerCharacterDataByUserIdAsync(userId, sessionId);
-                var dataList = data.ToList();
 
                 _logger.LogInformation($"플레이어 캐릭터 데이터 조회 성공: ID: {userId}");
-                return Ok(dataList);
+                return Ok(data);
             }
             catch (Exception ex)
             {

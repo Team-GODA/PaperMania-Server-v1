@@ -6,6 +6,8 @@ public class PlayerCharacterData
     public string CharacterId { get; set; } = null!;
     public string CharacterName { get; set; } = null!;
     public int CharacterLevel { get; set; } = 1;
+    public int NormalSkillLevel { get; set; } = 1;
+    public int EpicSkillLevel { get; set; } = 1;
     public string RarityString
     {
         get => Rarity.ToString();
