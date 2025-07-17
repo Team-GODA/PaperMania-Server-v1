@@ -62,4 +62,16 @@ public class DataRepository : IDataRepository
             Id = userId
         });
     }
+
+    public async Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int userId)
+    {
+        var sql = @"
+            SELECT id AS Id, character_id AS CharacterId, character_level AS CharacterLevel
+            FROM player_character_data
+            WHERE id = @Id
+            ";
+
+        var result = await _db.QueryAsync<PlayerCharacterData>(sql, new { Id = userId });
+        return result;
+    }
 }
