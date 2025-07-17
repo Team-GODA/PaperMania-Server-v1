@@ -89,10 +89,15 @@ public class DataService : IDataService
         return await _dataRepository.GetPlayerCharacterDataByUserIdAsync(userId);
     }
 
-    public async Task<PlayerCharacterData> AddPlayerCharacterDataByUserIdAsync(int userId, PlayerCharacterData data, string sessionId)
+    public async Task<PlayerCharacterData> AddPlayerCharacterDataByUserIdAsync(PlayerCharacterData data, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
-        return await _dataRepository.AddPlayerCharacterDataByUserIdAsync(userId, data);
+        
+        bool exists = await _dataRepository.IsNewCharacterExistAsync(data.Id, data.CharacterId);
+        if (exists)
+            throw new InvalidOperationException("이미 해당 캐릭터를 보유 중입니다.");
+        
+        return await _dataRepository.AddPlayerCharacterDataByUserIdAsync(data);
     }
 
     private async Task ValidateSessionAsync(string sessionId)
