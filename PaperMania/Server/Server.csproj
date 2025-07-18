@@ -23,7 +23,6 @@
 
     <ItemGroup>
       <Folder Include="Api\Controller\" />
-      <Folder Include="Application\Service\" />
     </ItemGroup>
 
     <ItemGroup>
