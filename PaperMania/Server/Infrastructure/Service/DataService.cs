@@ -18,7 +18,7 @@ public class DataService : IDataService
         _logger = logger;
     }
     
-    public async Task<string> AddPlayerNameAsync(string playerName, string sessionId)
+    public async Task<string> AddPlayerDataAsync(string playerName, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
         
@@ -38,7 +38,7 @@ public class DataService : IDataService
             throw new InvalidOperationException("이미 이름을 등록한 계정입니다.");
         }
         
-        await _dataRepository.AddPlayerNameAsync(playerName);
+        await _dataRepository.AddPlayerDataAsync(userId, playerName);
         await _accountRepository.UpdateIsNewAccountAsync(userId, false);
         
         return playerName;

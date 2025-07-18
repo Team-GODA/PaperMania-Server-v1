@@ -41,7 +41,7 @@ namespace Server.Api.Controller
 
             try
             {
-                 var result = await _dataService.AddPlayerNameAsync(request.PlayerName, sessionId);
+                 var result = await _dataService.AddPlayerDataAsync(request.PlayerName, sessionId);
                 
                 _logger.LogInformation("플레이어 이름 등록 성공: PlayerName = {PlayerName}", request.PlayerName);
                 return Created(string.Empty, new { message = "이름이 성공적으로 설정되었습니다." });
