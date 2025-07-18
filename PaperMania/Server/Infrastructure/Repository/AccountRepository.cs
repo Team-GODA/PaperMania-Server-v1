@@ -16,7 +16,7 @@ public class AccountRepository : RepositoryBase, IAccountRepository
         
         var sql = @"
             SELECT id, player_id AS PlayerId, email, password, is_new_account AS IsNewAccount,
-                   role AS Role, created_at AS CreatedAt, last_login AS LastLogin
+                   role AS Role, created_at AS CreatedAt
             FROM paper_mania_account_data.player_account_data
             WHERE player_id = @PlayerId
             LIMIT 1";
@@ -31,7 +31,7 @@ public class AccountRepository : RepositoryBase, IAccountRepository
         
         var sql = @"
             SELECT id, player_id AS PlayerId, email, password, is_new_account AS IsNewAccount,
-                   role AS Role, created_at AS CreatedAt, last_login AS LastLogin
+                   role AS Role, created_at AS CreatedAt
             FROM paper_mania_account_data.player_account_data
             WHERE email = @Email
             LIMIT 1";
