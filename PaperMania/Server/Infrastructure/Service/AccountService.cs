@@ -82,7 +82,7 @@ public class AccountService : IAccountService
             var user = await _repository.GetByEmailAsync(payload.Email);
             if (user == null)
             {
-                _logger.LogInformation("신규 구글 사용자 생성: {Email}", payload.Email");
+                _logger.LogInformation($"신규 구글 사용자 생성: {payload.Email}");
 
                 user = await _repository.AddAccountAsync(new PlayerAccountData
                 {
