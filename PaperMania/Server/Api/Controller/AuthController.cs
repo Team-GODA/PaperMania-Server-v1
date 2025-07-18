@@ -89,7 +89,36 @@ namespace Server.Api.Controller
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "서버 오류:  로그인 중 예외 발생");
+                _logger.LogError(ex, "서버 오류: 로그인 중 예외 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpPost("login/google")]
+        public async Task<ActionResult<GoogleLoginResponse>> LoginByGoogle([FromBody] GoogleLoginRequest request)
+        {
+            _logger.LogInformation("구글 로그인 시도");
+
+            try
+            {
+                var sessionId = await _accountService.LoginByGoogleAsync(request.IdToken);
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    _logger.LogWarning("구글 로그인 실패");
+                    return Unauthorized(new { message = "구글 로그인 실패." });
+                }
+
+                var response = new GoogleLoginResponse
+                {
+                    SessionId = sessionId,
+                    Message = $"구글 로그인 성공"
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "서버 오류: 구글 로그인 중 예외 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }
