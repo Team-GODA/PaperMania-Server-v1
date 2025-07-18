@@ -42,8 +42,6 @@ public class AccountService : IAccountService
         bool isVerified = BCrypt.Net.BCrypt.Verify(password, user.Password);
         if (!isVerified)
             return string.Empty;
-        
-        await UpdateLastLoginAsync(user.Id);
 
         var sessionId = await _sessionService.CreateSessionAsync(user.Id);
         
@@ -58,15 +56,5 @@ public class AccountService : IAccountService
         
         await _sessionService.DeleteSessionAsync(sessionId);
         return true;
-    }
-
-    public async Task UpdateLastLoginAsync(int userId)
-    {
-        var account = await _repository.GetByPlayerIdAsync(userId.ToString());
-        if (account != null)
-        {
-            account.LastLogin = DateTime.UtcNow;
-            await _repository.UpdateLastLoginAsync(account.Id);
-        }
     }
 }
