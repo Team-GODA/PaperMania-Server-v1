@@ -26,7 +26,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         return await db.QueryFirstOrDefaultAsync<PlayerGameData>(sql, new { PlayerName = playerName });
     }
 
-    public async Task AddPlayerDataAsync(int userId, string playerName)
+    public async Task AddPlayerDataAsync(int? userId, string playerName)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
