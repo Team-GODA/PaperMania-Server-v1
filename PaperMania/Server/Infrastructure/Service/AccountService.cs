@@ -53,8 +53,6 @@ public class AccountService : IAccountService
         bool isVerified = BCrypt.Net.BCrypt.Verify(password, user.Password);
         if (!isVerified)
             return string.Empty;
-        
-        await UpdateLastLoginAsync(user.Id);
 
         var sessionId = await _sessionService.CreateSessionAsync(user.Id);
         
@@ -70,7 +68,7 @@ public class AccountService : IAccountService
         await _sessionService.DeleteSessionAsync(sessionId);
         return true;
     }
-
+    
     public async Task<string?> LoginByGoogleAsync(string idToken)
     {
         try
@@ -84,11 +82,11 @@ public class AccountService : IAccountService
             var user = await _repository.GetByEmailAsync(payload.Email);
             if (user == null)
             {
-                _logger.LogWarning("");
+                _logger.LogInformation("신규 구글 사용자 생성: {Email}", payload.Email");
 
                 user = await _repository.AddAccountAsync(new PlayerAccountData
                 {
-                    PlayerId = payload.Name,
+                    PlayerId = payload.Subject,
                     Password = "",
                     Role = "user",
                     Email = payload.Email,
@@ -108,16 +106,6 @@ public class AccountService : IAccountService
         {
             _logger.LogError("구글 토큰 검증 중 예기치 못한 오류 발생: {Message}", ex.Message);
             return null;
-        }
-    }
-
-    public async Task UpdateLastLoginAsync(int userId)
-    {
-        var account = await _repository.GetByPlayerIdAsync(userId.ToString());
-        if (account != null)
-        {
-            account.LastLogin = DateTime.UtcNow;
-            await _repository.UpdateLastLoginAsync(account.Id);
         }
     }
 }

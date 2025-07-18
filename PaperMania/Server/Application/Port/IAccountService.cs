@@ -10,5 +10,4 @@ public interface IAccountService
     Task<string?> LoginAsync(string playerId, string password);
     Task<bool> LogoutAsync(string sessionId);
     Task<string?> LoginByGoogleAsync(string idToken);
-    Task UpdateLastLoginAsync(int userId);
 }
