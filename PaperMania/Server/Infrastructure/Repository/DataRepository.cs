@@ -26,16 +26,16 @@ public class DataRepository : RepositoryBase, IDataRepository
         return await db.QueryFirstOrDefaultAsync<PlayerGameData>(sql, new { PlayerName = playerName });
     }
 
-    public async Task AddPlayerNameAsync(string playerName)
+    public async Task AddPlayerDataAsync(int? userId, string playerName)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
-        
-        var sql = @"
-            INSERT INTO paper_mania_game_data.player_game_data (player_name)
-            VALUES (@PlayerName)";
 
-        await db.ExecuteAsync(sql, new { PlayerName = playerName });
+        var sql = @"
+        INSERT INTO paper_mania_game_data.player_game_data (id, player_name)
+        VALUES (@UserId, @PlayerName)";
+
+        await db.ExecuteAsync(sql, new { UserId = userId, PlayerName = playerName });
     }
 
     public async Task<PlayerGameData?> GetPlayerDataByIdAsync(int userId)
