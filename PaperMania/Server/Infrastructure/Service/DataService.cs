@@ -38,7 +38,7 @@ public class DataService : IDataService
             throw new InvalidOperationException("이미 이름을 등록한 계정입니다.");
         }
         
-        await _dataRepository.AddPlayerNameAsync(playerName);
+        await _dataRepository.AddPlayerDataAsync(playerName);
         await _accountRepository.UpdateIsNewAccountAsync(userId, false);
         
         return playerName;
