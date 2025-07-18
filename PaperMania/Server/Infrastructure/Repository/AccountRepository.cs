@@ -39,13 +39,16 @@ public class AccountRepository : IAccountRepository
         return await _db.QueryFirstOrDefaultAsync<PlayerAccountData>(sql, new { Email = email });
     }
 
-    public async Task AddAccountAsync(PlayerAccountData player)
+    public async Task<PlayerAccountData?> AddAccountAsync(PlayerAccountData player)
     {
         var sql = @"
             INSERT INTO player_account_data (player_id, email, password, is_new_account, role)
-            VALUES (@PlayerId, @Email, @Password, @IsNewAccount, @Role)";
+            VALUES (@PlayerId, @Email, @Password, @IsNewAccount, @Role)
+            RETURNING id";
     
-        await _db.ExecuteAsync(sql, player);
+        var id = await _db.QuerySingleAsync<int>(sql, player);
+        player.Id = id;
+        return player;
     }
 
     public async Task UpdateLastLoginAsync(int playerId)
