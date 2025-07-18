@@ -25,11 +25,11 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDataService, DataService>();
 
+var keyName = "DbConnectionString";
+
 builder.Services.AddScoped<IAccountRepository>(provider =>
 {
     var config = provider.GetRequiredService<IConfiguration>();
-
-    var keyName = env.IsDevelopment() ? "AccountDbConnectionString-local" : "AccountDbConnectionString";
     var connectionString = config[keyName];
 
     return new AccountRepository(connectionString!);
@@ -37,8 +37,6 @@ builder.Services.AddScoped<IAccountRepository>(provider =>
 builder.Services.AddScoped<IDataRepository>(provider =>
 {
     var config = provider.GetRequiredService<IConfiguration>();
-
-    var keyName = env.IsDevelopment() ? "GameDataDbConnectionString-local" : "GameDataDbConnectionString";
     var connectionString = config[keyName];
 
     return new DataRepository(connectionString!);

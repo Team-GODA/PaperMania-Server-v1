@@ -9,5 +9,4 @@ public class PlayerAccountData
     public bool IsNewAccount { get; set; } = true;
     public string Role { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
-    public DateTime? LastLogin { get; set; }
 }
