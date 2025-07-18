@@ -1,7 +1,4 @@
-﻿﻿using System.Data;
-using Dapper;
-using Npgsql;
-using NuGet.Protocol.Plugins;
+﻿using Dapper;
 using Server.Application.Port;
 using Server.Domain.Entity;
 
@@ -20,7 +17,7 @@ public class AccountRepository : RepositoryBase, IAccountRepository
         var sql = @"
             SELECT id, player_id AS PlayerId, email, password, is_new_account AS IsNewAccount,
                    role AS Role, created_at AS CreatedAt, last_login AS LastLogin
-            FROM player_account_data
+            FROM paper_mania_account_data.player_account_data
             WHERE player_id = @PlayerId
             LIMIT 1";
 
@@ -35,7 +32,7 @@ public class AccountRepository : RepositoryBase, IAccountRepository
         var sql = @"
             SELECT id, player_id AS PlayerId, email, password, is_new_account AS IsNewAccount,
                    role AS Role, created_at AS CreatedAt, last_login AS LastLogin
-            FROM player_account_data
+            FROM paper_mania_account_data.player_account_data
             WHERE email = @Email
             LIMIT 1";
         
@@ -48,7 +45,7 @@ public class AccountRepository : RepositoryBase, IAccountRepository
         await db.OpenAsync();
         
         var sql = @"
-            INSERT INTO player_account_data (player_id, email, password, is_new_account, role)
+            INSERT INTO paper_mania_account_data.player_account_data (player_id, email, password, is_new_account, role)
             VALUES (@PlayerId, @Email, @Password, @IsNewAccount, @Role)
             RETURNING id";
     
@@ -64,7 +61,7 @@ public class AccountRepository : RepositoryBase, IAccountRepository
         
         var sql = @"
             SELECT is_new_account AS IsNewAccount
-            FROM player_account_data
+            FROM paper_mania_account_data.player_account_data
             WHERE Id = @Id
             LIMIT 1";
         
@@ -77,7 +74,7 @@ public class AccountRepository : RepositoryBase, IAccountRepository
         await db.OpenAsync();
         
         var sql = @"
-            UPDATE player_account_data
+            UPDATE paper_mania_account_data.player_account_data
             SET is_new_account = @IsNew
             WHERE id = @Id";
 
