@@ -89,6 +89,8 @@ public class AccountService : IAccountService
                 user = await _repository.AddAccountAsync(new PlayerAccountData
                 {
                     PlayerId = payload.Name,
+                    Password = "",
+                    Role = "user",
                     Email = payload.Email,
                     CreatedAt = DateTime.UtcNow
                 });
