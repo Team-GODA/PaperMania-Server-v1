@@ -19,7 +19,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         
         var sql = @"
             SELECT id, player_name AS PlayerName, player_exp AS PlayerExp, player_level AS PlayerLevel
-            FROM player_game_data
+            FROM paper_mania_game_data.player_game_data
             WHERE player_name = @PlayerName
             LIMIT 1";
         
@@ -32,7 +32,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         await db.OpenAsync();
         
         var sql = @"
-            INSERT INTO player_game_data (player_name)
+            INSERT INTO paper_mania_game_data.player_game_data (player_name)
             VALUES (@PlayerName)";
 
         await db.ExecuteAsync(sql, new { PlayerName = playerName });
@@ -45,7 +45,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         
         var sql = @"
             SELECT id AS Id, player_name AS PlayerName, player_exp AS PlayerExp, player_level AS PlayerLevel
-            FROM player_game_data
+            FROM paper_mania_game_data.player_game_data
             WHERE id = @Id
             LIMIT 1";
         
@@ -58,7 +58,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         await db.OpenAsync();
         
         var sql = @"
-            UPDATE player_game_data
+            UPDATE paper_mania_game_data.player_game_data
             SET player_level = @Level, player_exp = @Exp
             WHERE id = @Id
             RETURNING id, player_name AS PlayerName, player_exp AS PlayerExp, player_level AS PlayerLevel;
@@ -81,8 +81,8 @@ public class DataRepository : RepositoryBase, IDataRepository
             SELECT P.user_id AS Id, P.character_id AS CharacterId, P.character_level AS CharacterLevel,
                    P.normal_skill_level AS NormalSkillLevel, P.epic_skill_level AS EpicSkillLevel,
                    C.character_name AS CharacterName, C.rarity AS RarityString
-            FROM player_character_data P
-            JOIN character_data C ON P.character_id = C.character_id
+            FROM paper_mania_game_data.player_character_data P
+            JOIN paper_mania_game_data.character_data C ON P.character_id = C.character_id
             WHERE P.user_id = @Id
             ";
 
@@ -96,7 +96,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         await db.OpenAsync();
         
         var sql = @"
-            INSERT INTO player_character_data (user_id, character_id)
+            INSERT INTO paper_mania_game_data.player_character_data (user_id, character_id)
             VALUES (@UserId, @CharacterId);
             ";
         
@@ -117,8 +117,8 @@ public class DataRepository : RepositoryBase, IDataRepository
                     P.epic_skill_level AS EpicSkillLevel,
                     C.character_name AS CharacterName,
                     C.rarity AS RarityString
-                FROM player_character_data P
-                JOIN character_data C ON P.character_id = C.character_id
+                FROM paper_mania_game_data.player_character_data P
+                JOIN paper_mania_game_data.character_data C ON P.character_id = C.character_id
                 WHERE P.user_id = @UserId AND P.character_id = @CharacterId",
             new { UserId =data.Id, data.CharacterId });
         
@@ -132,7 +132,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         
         var sql = @"
             SELECT 1
-            FROM player_character_data
+            FROM paper_mania_game_data.player_character_data
             WHERE user_id = @UserId AND character_id = @CharacterId
             LIMIT 1;
     ";
@@ -148,7 +148,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         
         const string sql = @"
             SELECT user_id AS Id, character_name AS CharacterName, rarity AS RarityString
-            FROM player_character_data
+            FROM paper_mania_game_data.player_character_data
             WHERE user_id = @Id
             ";
 
