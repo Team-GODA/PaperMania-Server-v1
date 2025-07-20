@@ -25,7 +25,6 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDataService, DataService>();
 
-// 실험
 var keyName = "DbConnectionString";
 
 builder.Services.AddScoped<IAccountRepository>(provider =>
