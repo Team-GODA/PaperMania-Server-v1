@@ -37,8 +37,11 @@ jobs:
           docker pull ${{ secrets.DOCKER_USERNAME }}/papermania-server:latest
           docker stop papermania-server || true
           docker rm papermania-server || true
-          docker run -d \
+           docker run -d \
             --name papermania-server \
             --network paper-mania-net \
             -p 20834:8080 \
+            -e AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }} \
+            -e AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }} \
+            -e AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }} \
             ${{ secrets.DOCKER_USERNAME }}/papermania-server:latest
