@@ -19,12 +19,12 @@ jobs:
     - name: Build Docker image
       run: |
         docker build \
-          -t ${{ secrets.DOCKER_USERNAME }}/paper-mania-server:latest \
+          -t ${{ secrets.DOCKER_USERNAME }}/papermania-server:latest \
           -f PaperMania/Server/Dockerfile \
           PaperMania/Server
 
     - name: Push Docker image
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/paper-mania-server:latest
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/papermania-server:latest
 
     - name: Deploy to server via SSH
       uses: appleboy/ssh-action@v0.1.10
@@ -34,11 +34,11 @@ jobs:
         port: ${{ secrets.SSH_PORT }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/paper-mania-server:latest
-          docker stop paper-mania-server || true
-          docker rm paper-mania-server || true
+          docker pull ${{ secrets.DOCKER_USERNAME }}/papermania-server:latest
+          docker stop papermania-server || true
+          docker rm papermania-server || true
           docker run -d \
-            --name paper-mania-server \
+            --name papermania-server \
             --network paper-mania-net \
             -p 20834:8080 \
-            ${{ secrets.DOCKER_USERNAME }}/paper-mania-server:latest
+            ${{ secrets.DOCKER_USERNAME }}/papermania-server:latest
