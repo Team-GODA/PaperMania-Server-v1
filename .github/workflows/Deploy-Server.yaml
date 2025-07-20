@@ -35,5 +35,5 @@ jobs:
           docker run -d \
             --name paper-mania-server \
             --network paper-mania-net \
-            -p 8080:8080 \
+            -p 20834:8080 \
             ${{ secrets.DOCKER_USERNAME }}/paper-mania-server:latest
