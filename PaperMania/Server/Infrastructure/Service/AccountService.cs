@@ -22,17 +22,17 @@ public class AccountService : IAccountService
     
     public async Task<PlayerAccountData?> GetByPlayerIdAsync(string playerId)
     {
-        return await _repository.GetByPlayerIdAsync(playerId);
+        return await _repository.GetAccountDataByPlayerIdAsync(playerId);
     }
 
     public async Task<PlayerAccountData?> GetByEmailAsync(string email)
     {
-        return await _repository.GetByEmailAsync(email);
+        return await _repository.GetAccountDataByEmailAsync(email);
     }
 
     public async Task<PlayerAccountData?> RegisterAsync(PlayerAccountData player, string password)
     {
-        var exists = await _repository.GetByEmailAsync(player.Email);
+        var exists = await _repository.GetAccountDataByEmailAsync(player.Email);
         if (exists != null)
             return null;
         
@@ -46,7 +46,7 @@ public class AccountService : IAccountService
 
     public async Task<string?> LoginAsync(string playerId, string password)
     {
-        var user = await _repository.GetByPlayerIdAsync(playerId);
+        var user = await _repository.GetAccountDataByPlayerIdAsync(playerId);
         if (user == null) 
             return string.Empty;
         
@@ -79,7 +79,7 @@ public class AccountService : IAccountService
                     Audience = new[] { _googleClientId }
                 });
             
-            var user = await _repository.GetByEmailAsync(payload.Email);
+            var user = await _repository.GetAccountDataByEmailAsync(payload.Email);
             if (user == null)
             {
                 _logger.LogInformation($"신규 구글 사용자 생성: {payload.Email}");
