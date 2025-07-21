@@ -42,6 +42,8 @@ builder.Services.AddScoped<IDataRepository>(provider =>
     return new DataRepository(connectionString!);
 });
 
+// ..
+
 builder.Services.AddControllers();
 
 builder.Services.AddApiVersioning(options =>
