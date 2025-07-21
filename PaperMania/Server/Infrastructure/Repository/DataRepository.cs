@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Formats.Asn1;
 using Dapper;
 using Npgsql;
 using Server.Application.Port;
@@ -141,12 +142,26 @@ public class DataRepository : RepositoryBase, IDataRepository
         return result.HasValue;
     }
 
+    public async Task RenamePlayerNameAsync(int userId, string newPlayerName)
+    {
+        await using var db = CreateConnection();
+        await db.OpenAsync();
+        
+        var sql = @"
+            UPDATE paper_mania_game_data.player_game_data
+            SET player_name = @PlayerName
+            WHERE id = @Id
+            RETURNING player_name AS PlayerName";
+        
+        await db.ExecuteAsync(sql, new { PlayerName = newPlayerName, Id = userId });
+    }
+
     public async Task<PlayerCharacterData?> GetCharacterByUserIdAsync(int userId)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
         
-        const string sql = @"
+        var sql = @"
             SELECT user_id AS Id, character_name AS CharacterName, rarity AS RarityString
             FROM paper_mania_game_data.player_character_data
             WHERE user_id = @Id
