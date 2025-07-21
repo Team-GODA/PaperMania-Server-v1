@@ -109,6 +109,8 @@ namespace Server.Api.Controller
                     return Conflict(new { message = "플레이어 이름 재설정 실패 : NewName 누락 오류" });
                 
                 await _dataService.RenamePlayerNameAsync(userId, request.NewName, sessionId);
+                
+                _logger.LogInformation($"플레이어 이름 재설정 성공: Id: {userId}, NewName: {request.NewName}");
                 return Ok(new { newName = request.NewName });
             }
             catch (Exception ex)
