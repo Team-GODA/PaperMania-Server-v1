@@ -141,6 +141,11 @@ public class DataRepository : RepositoryBase, IDataRepository
         return result.HasValue;
     }
 
+    public async Task<string?> RenamePlayerNameAsync(int userId, string playerName)
+    {
+        
+    }
+
     public async Task<PlayerCharacterData?> GetCharacterByUserIdAsync(int userId)
     {
         await using var db = CreateConnection();

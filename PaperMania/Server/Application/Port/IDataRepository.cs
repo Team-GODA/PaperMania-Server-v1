@@ -11,4 +11,5 @@ public interface IDataRepository
     Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int userId);
     Task<PlayerCharacterData> AddPlayerCharacterDataByUserIdAsync(PlayerCharacterData data);
     Task<bool> IsNewCharacterExistAsync(int userId, string characterId);
+    Task<string?> RenamePlayerNameAsync(int userId, string playerName);
 }
