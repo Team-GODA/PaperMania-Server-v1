@@ -29,10 +29,10 @@ namespace Server.Api.Controller
             return true;
         }
 
-        [HttpPost("name")]
-        public async Task<IActionResult> AddPlayerName(
+        [HttpPost("player")]
+        public async Task<IActionResult> AddPlayerData(
             [FromHeader(Name = "Session-Id")] string sessionId,
-            [FromBody] AddPlayerNameRequest request)
+            [FromBody] AddPlayerDataRequest request)
         {
             _logger.LogInformation($"플레이어 이름 등록 시도: PlayerName = {request.PlayerName}");
             
