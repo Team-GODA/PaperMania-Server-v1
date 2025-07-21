@@ -66,7 +66,7 @@ namespace Server.Api.Controller
         [HttpGet("name/{id}")]
         public async Task<IActionResult> GetPlayerNameById(
             [FromHeader(Name = "Session-Id")] string sessionId,
-            [FromRoute(Name = "id")]int userId)
+            [FromRoute(Name = "id")] int userId)
         {
             _logger.LogInformation($"플레이어 이름 조회 시도: Id: {userId}");
 
@@ -92,6 +92,32 @@ namespace Server.Api.Controller
             }
         }
 
+        [HttpPatch("name/{id}")]
+        public async Task<IActionResult> RenamePlayerName(
+            [FromHeader(Name = "Session-Id")] string sessionId,
+            [FromRoute(Name = "id")] int userId, 
+            [FromBody] RenamePlayerNameRequest request)
+        {
+            _logger.LogInformation($"플레이어 이름 재설정 시도: Id: {userId}");
+
+            if (!CheckSessionId(sessionId))
+                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            
+            try
+            {
+                if (request.NewName == null)
+                    return Conflict(new { message = "플레이어 이름 재설정 실패 : NewName 누락 오류" });
+                
+                await _dataService.RenamePlayerNameAsync(userId, request.NewName, sessionId);
+                return Ok(new { newName = request.NewName });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 이름 재설정 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
         [HttpGet("level/{id}")]
         public async Task<IActionResult> GetPlayerLevelById(
             [FromHeader(Name = "Session-Id")] string sessionId,
@@ -104,21 +130,20 @@ namespace Server.Api.Controller
 
             try
             {
-                var id = userId;
                 var level = await _dataService.GetPlayerLevelByUserIdAsync(userId, sessionId);
                 var exp = await _dataService.GetPlayerExpByUserIdAsync(userId, sessionId);
                 
                 _logger.LogInformation($"플레이어 레벨 조회 성공: PlayerLevel: {level}");
                 return Ok(new
                 {
-                    id,
+                    userId,
                     level,
                     exp
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "플레이어 이름 조회 중 오류 발생");
+                _logger.LogError(ex, "플레이어 레벨 조회 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }
@@ -152,7 +177,7 @@ namespace Server.Api.Controller
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "플레이어 이름 조회 중 오류 발생");
+                _logger.LogError(ex, "플레이어 레벨 갱신 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }

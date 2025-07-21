@@ -142,7 +142,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         return result.HasValue;
     }
 
-    public async Task RenamePlayerNameAsync(int userId, string playerName)
+    public async Task RenamePlayerNameAsync(int userId, string newPlayerName)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
@@ -150,11 +150,10 @@ public class DataRepository : RepositoryBase, IDataRepository
         var sql = @"
             UPDATE paper_mania_game_data.player_game_data
             SET player_name = @PlayerName
-            WHERE id = @UserId
-            RETURNING player_name AS PlayerName;
-            ";
+            WHERE id = @Id
+            RETURNING player_name AS PlayerName";
         
-        await db.ExecuteAsync(sql, new { UserId = userId, PlayerName = playerName });
+        await db.ExecuteAsync(sql, new { PlayerName = newPlayerName, Id = userId });
     }
 
     public async Task<PlayerCharacterData?> GetCharacterByUserIdAsync(int userId)

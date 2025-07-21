@@ -12,5 +12,5 @@ public interface IDataService
     Task<PlayerGameData> UpdatePlayerLevelAsync(int userId, int level, int exp, string sessionId);
     Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int userId, string sessionId);
     Task<PlayerCharacterData> AddPlayerCharacterDataByUserIdAsync(PlayerCharacterData data, string sessionId);
-    Task RenamePlayerNameAsync(int userId, string playerName, string sessionId);
+    Task RenamePlayerNameAsync(int userId, string newPlayerName, string sessionId);
 }
