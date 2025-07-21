@@ -100,6 +100,20 @@ public class DataService : IDataService
         return await _dataRepository.AddPlayerCharacterDataByUserIdAsync(data);
     }
 
+    public async Task RenamePlayerNameAsync(int userId, string newPlayerName, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        
+        var exists = await _dataRepository.ExistsPlayerNameAsync(newPlayerName);
+        if (exists != null)
+        {
+            _logger.LogWarning($"이미 존재하는 이름입니다. player_name: {newPlayerName}");
+            throw new InvalidOperationException("이미 존재하는 플레이어 이름입니다.");
+        }
+
+        await _dataRepository.RenamePlayerNameAsync(userId, newPlayerName);
+    }
+
     private async Task ValidateSessionAsync(string sessionId)
     {
         var isValid = await _sessionService.ValidateSessionAsync(sessionId);
