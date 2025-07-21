@@ -78,9 +78,12 @@ namespace Server.Api.Controller
                     return Unauthorized(new { message = "아이디 또는 비밀번호가 올바르지 않습니다." });
                 }
 
+                var data = await _accountService.GetByPlayerIdAsync(request.PlayerId);
+                
                 var response = new LoginResponse
                 {
                     Message = "로그인 성공",
+                    Id = data!.Id,
                     SessionId = sessionId
                 };
 
