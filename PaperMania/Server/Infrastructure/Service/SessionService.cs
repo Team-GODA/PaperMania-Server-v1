@@ -4,7 +4,7 @@ namespace Server.Infrastructure.Service;
 
 public class SessionService : ISessionService
 {
-    private ICacheService _cacheService;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<SessionService> _logger;
     private readonly TimeSpan _sessionTimeout = TimeSpan.FromHours(24);
 
