@@ -44,4 +44,3 @@ jobs:
             -e AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }} \
             -e AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }} \
             -e AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }} \
-            ${{ secrets.DOCKER_USERNAME }}/papermania-server:latest
