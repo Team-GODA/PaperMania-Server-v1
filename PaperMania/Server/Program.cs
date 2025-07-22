@@ -24,6 +24,7 @@ builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDataService, DataService>();
+builder.Services.AddScoped<IGoodsService, GoodsService>();
 
 var keyName = "DbConnectionString";
 
@@ -40,6 +41,13 @@ builder.Services.AddScoped<IDataRepository>(provider =>
     var connectionString = config[keyName];
 
     return new DataRepository(connectionString!);
+});
+builder.Services.AddScoped<IGoodsRepository>(provider =>
+{
+    var config = provider.GetRequiredService<IConfiguration>();
+    var connectionString = config[keyName];
+
+    return new GoodsRepository(connectionString!);
 });
 
 builder.Services.AddControllers();

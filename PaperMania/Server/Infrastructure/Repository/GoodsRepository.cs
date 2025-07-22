@@ -6,7 +6,7 @@ namespace Server.Infrastructure.Repository;
 
 public class GoodsRepository : RepositoryBase, IGoodsRepository
 {
-    protected GoodsRepository(string connectionString) : base(connectionString)
+    public GoodsRepository(string connectionString) : base(connectionString)
     {
     }
     
