@@ -4,7 +4,6 @@ namespace Server.Application.Port;
 
 public interface IGoodsService
 {
-    Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId, string sessionId);
-    Task UpdatePlayerGoodsDataAsync(PlayerGoodsData data, string sessionId);
     Task<int> GetPlayerActionPointAsync(int userId, string sessionId);
+    Task<int> UpdatePlayerMaxActionPoint(int userId, int newMaxActionPoint, string sessionId);
 }
