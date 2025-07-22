@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Server.Api.Dto.Request;
 using Server.Application.Port;
 
 namespace Server.Api.Controller
@@ -49,6 +50,30 @@ namespace Server.Api.Controller
             catch (Exception ex)
             {
                 _logger.LogError(ex, "플레이어 AP 조회 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpPost("action-point/max")]
+        public async Task<IActionResult> UpdatePlayerMaxActionPoint(
+            [FromHeader(Name = "Session-Id")] string sessionId,
+            [FromBody] UpdatePlayerMaxActionPointRequest request)
+        {
+            _logger.LogInformation($"플레이어 최대 AP 갱신 시도");
+
+            try
+            {
+                var newMaxActionPoint = await _goodsService.UpdatePlayerMaxActionPoint(request.Id, request.NewMaxActionPoint,sessionId);
+                
+                _logger.LogInformation($"플레이어 최대 AP 갱신 성공 : Id : {request.Id}");
+                return Ok(new
+                {
+                    newMaxActionPoint
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 최대 AP 갱신 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }
