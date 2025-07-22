@@ -7,12 +7,12 @@ namespace Server.Api.Controller
     [ApiController]
     public class GoodsController : ControllerBase
     {
-        private readonly IDataService _dataService;
-        private readonly ILogger<DataController> _logger;
+        private readonly IGoodsService _goodsService;
+        private readonly ILogger<GoodsController> _logger;
 
-        public GoodsController(IDataService dataService, ILogger<DataController> logger)
+        public GoodsController(IGoodsService goodsService, ILogger<GoodsController> logger)
         {
-            _dataService = dataService;
+            _goodsService = goodsService;
             _logger = logger;
         }
         
@@ -38,9 +38,8 @@ namespace Server.Api.Controller
 
             try
             {
-                var data = await _dataService.GetPlayerGoodsDataByUserIdAsync(userId, sessionId);
-                var currentActionPoint = data.ActionPoint;
-
+                var currentActionPoint = await _goodsService.GetPlayerActionPointAsync(userId, sessionId);
+                
                 _logger.LogInformation($"플레이어 AP 조회 성공 : Id : {userId}");
                 return Ok(new
                 {

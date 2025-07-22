@@ -33,6 +33,34 @@ public class GoodsService : IGoodsService
         return data;
     }
 
+    public async Task<int> GetPlayerActionPointAsync(int userId, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+                
+        var currentActionPoint = data.ActionPoint;
+        var maxActionPoint = data.MaxActionPoint;
+        var lastRegenTime = data.LastActionPointUpdated;
+       
+        var nowUtc = DateTime.UtcNow;
+    
+        int regenIntervalSeconds = 120;
+        int secondsPassed = (int)(nowUtc - lastRegenTime).TotalSeconds;
+        int regenAmount = secondsPassed / regenIntervalSeconds;
+
+        if (regenAmount > 0 && currentActionPoint < maxActionPoint)
+        {
+            int apToAdd = Math.Min(regenAmount, maxActionPoint - currentActionPoint);
+            currentActionPoint += apToAdd;
+            data.ActionPoint = currentActionPoint;
+            data.LastActionPointUpdated = lastRegenTime.AddSeconds(apToAdd * regenIntervalSeconds);
+
+            await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+        }
+
+        return data.ActionPoint;
+    }
+
     public async Task UpdatePlayerGoodsDataAsync(PlayerGoodsData data, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
