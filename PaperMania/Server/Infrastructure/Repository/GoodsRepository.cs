@@ -45,6 +45,7 @@ public class GoodsRepository : RepositoryBase, IGoodsRepository
         var sql = @"
             UPDATE paper_mania_game_data.player_goods_data
             SET action_point = @ActionPoint,
+                action_point_max = @MaxActionPoint,
                 last_action_point_updated = @LastActionPointUpdated,
                 gold = @Gold,
                 paper_piece = @PaperPiece
