@@ -71,4 +71,15 @@ public class GoodsService : IGoodsService
         await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
         return newMaxActionPoint;
     }
+
+    public async Task<int> UpdatePlayerActionPointAsync(int userId, int newActionPoint, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        
+        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        data.ActionPoint = newActionPoint;
+        
+        await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+        return newActionPoint;
+    }
 }
