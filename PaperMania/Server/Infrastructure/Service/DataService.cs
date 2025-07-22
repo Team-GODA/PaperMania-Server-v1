@@ -39,6 +39,7 @@ public class DataService : IDataService
         }
         
         await _dataRepository.AddPlayerDataAsync(userId, playerName);
+        await _dataRepository.AddPlayerGoodsDataByUserIdAsync(userId);
         await _accountRepository.UpdateIsNewAccountAsync(userId, false);
         
         return playerName;

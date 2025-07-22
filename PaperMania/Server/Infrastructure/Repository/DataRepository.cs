@@ -169,7 +169,22 @@ public class DataRepository : RepositoryBase, IDataRepository
         
         await db.ExecuteAsync(sql, new { PlayerName = newPlayerName, Id = userId });
     }
-    
+
+    public async Task AddPlayerGoodsDataByUserIdAsync(int? userId)
+    {
+        await using var db = CreateConnection();
+        await db.OpenAsync();
+
+        var sql = @"
+            INSERT INTO paper_mania_game_data.player_goods_data(id)
+            VALUES (@UserId)";
+
+        await db.ExecuteAsync(sql, new
+        {
+            UserId = userId
+        });
+    }
+
     public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId)
     {
         await using var db = CreateConnection();
