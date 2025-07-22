@@ -169,34 +169,4 @@ public class DataRepository : RepositoryBase, IDataRepository
         
         await db.ExecuteAsync(sql, new { PlayerName = newPlayerName, Id = userId });
     }
-
-    public async Task AddPlayerGoodsDataByUserIdAsync(int? userId)
-    {
-        await using var db = CreateConnection();
-        await db.OpenAsync();
-
-        var sql = @"
-            INSERT INTO paper_mania_game_data.player_goods_data(id)
-            VALUES (@UserId)";
-
-        await db.ExecuteAsync(sql, new
-        {
-            UserId = userId
-        });
-    }
-
-    public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId)
-    {
-        await using var db = CreateConnection();
-        await db.OpenAsync();
-
-        var sql = @"
-            SELECT id AS Id, action_point AS ActionPoint, action_point_max AS MaxActionPoint, 
-                gold AS Gold, paper_piece AS PaperPiece
-            FROM paper_mania_game_data.player_goods_data
-            WHERE id = @Id";
-        
-        var result = await db.QueryFirstOrDefaultAsync<PlayerGoodsData>(sql, new { Id = userId });
-        return result ?? throw new InvalidOperationException($"플레이어 재화 데이터 NULL : Id : {userId}");
-    }
 }
