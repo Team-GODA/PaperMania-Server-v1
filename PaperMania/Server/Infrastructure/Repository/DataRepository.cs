@@ -142,6 +142,20 @@ public class DataRepository : RepositoryBase, IDataRepository
         return result.HasValue;
     }
 
+    public async Task<PlayerCharacterData?> GetCharacterByUserIdAsync(int userId)
+    {
+        await using var db = CreateConnection();
+        await db.OpenAsync();
+        
+        var sql = @"
+            SELECT user_id AS Id, character_name AS CharacterName, rarity AS RarityString
+            FROM paper_mania_game_data.player_character_data
+            WHERE user_id = @Id
+            ";
+
+        return await db.QuerySingleOrDefaultAsync<PlayerCharacterData>(sql, new { Id = userId });
+    }
+    
     public async Task RenamePlayerNameAsync(int userId, string newPlayerName)
     {
         await using var db = CreateConnection();
@@ -155,18 +169,19 @@ public class DataRepository : RepositoryBase, IDataRepository
         
         await db.ExecuteAsync(sql, new { PlayerName = newPlayerName, Id = userId });
     }
-
-    public async Task<PlayerCharacterData?> GetCharacterByUserIdAsync(int userId)
+    
+    public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
-        
-        var sql = @"
-            SELECT user_id AS Id, character_name AS CharacterName, rarity AS RarityString
-            FROM paper_mania_game_data.player_character_data
-            WHERE user_id = @Id
-            ";
 
-        return await db.QuerySingleOrDefaultAsync<PlayerCharacterData>(sql, new { Id = userId });
+        var sql = @"
+            SELECT id AS Id, action_point AS ActionPoint, action_point_max AS MaxActionPoint, 
+                gold AS Gold, paper_piece AS PaperPiece
+            FROM paper_mania_game_data.player_goods_data
+            WHERE id = @Id";
+        
+        var result = await db.QueryFirstOrDefaultAsync<PlayerGoodsData>(sql, new { Id = userId });
+        return result ?? throw new InvalidOperationException($"플레이어 재화 데이터 NULL : Id : {userId}");
     }
 }

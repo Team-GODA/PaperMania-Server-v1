@@ -114,6 +114,14 @@ public class DataService : IDataService
         await _dataRepository.RenamePlayerNameAsync(userId, newPlayerName);
     }
 
+    public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        var data = await _dataRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+
+        return data;
+    }
+
     private async Task ValidateSessionAsync(string sessionId)
     {
         var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
