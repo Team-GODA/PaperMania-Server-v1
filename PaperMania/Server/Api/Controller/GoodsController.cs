@@ -69,19 +69,20 @@ namespace Server.Api.Controller
 
         [HttpPost("action-point")]
         public async Task<IActionResult> UpdatePlayerActionPoint(
-            [FromBody] UpdatePlayerActionPointRequest request)
+            [FromBody] UsePlayerActionPointRequest request)
         {
             _logger.LogInformation($"플레이어 AP 갱신 시도 : Id : {request.Id}");
             var sessionId = HttpContext.Items["SessionId"] as string;
             
             try
             {
-                var newActionPoint = await _goodsService.UpdatePlayerActionPointAsync(request.Id, request.NewActionPoint, sessionId);
-                
+                await _goodsService.UsePlayerActionPointAsync(request.Id, request.UsedActionPoint, sessionId);
+                var currentActionPoint = await _goodsService.GetPlayerActionPointAsync(request.Id, sessionId);
+
                 _logger.LogInformation($"플레이어 AP 갱신 성공 : Id : {request.Id}");
                 return Ok(new
                 {
-                    newActionPoint
+                    CurrentActionPoint = currentActionPoint
                 });
             }
             catch (Exception ex)

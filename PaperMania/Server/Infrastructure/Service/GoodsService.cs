@@ -51,16 +51,17 @@ public class GoodsService : IGoodsService
         return newMaxActionPoint;
     }
 
-    public async Task<int> UpdatePlayerActionPointAsync(int userId, int newActionPoint, string sessionId)
+    public async Task UsePlayerActionPointAsync(int userId, int usedActionPoint, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
-        
+
         var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
-        data.ActionPoint = newActionPoint;
+        await RegenerateActionPointAsync(data);
+
+        data.ActionPoint = Math.Max(data.ActionPoint - usedActionPoint, 0);
         data.LastActionPointUpdated = DateTime.UtcNow;
-        
+
         await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
-        return newActionPoint;
     }
 
     private async Task<bool> RegenerateActionPointAsync(PlayerGoodsData data)
