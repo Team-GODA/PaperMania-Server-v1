@@ -61,7 +61,11 @@ public class AccountService : IAccountService
 
     public async Task<bool> LogoutAsync(string sessionId)
     {
-        var isVaild = await _sessionService.ValidateSessionAsync(sessionId);
+        var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
+        if (userId == null)
+            return false;
+        
+        var isVaild = await _sessionService.ValidateSessionAsync(sessionId, userId.Value);
         if (!isVaild)
             return false;
         
