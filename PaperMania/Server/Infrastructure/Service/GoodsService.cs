@@ -7,11 +7,13 @@ public class GoodsService : IGoodsService
 {
     private readonly IGoodsRepository _goodsRepository;
     private readonly ISessionService _sessionService;
+    private readonly ILogger<GoodsService> _logger;
 
-    public GoodsService(IGoodsRepository goodsRepository, ISessionService sessionService)
+    public GoodsService(IGoodsRepository goodsRepository, ISessionService sessionService, ILogger<GoodsService> logger)
     {
         _goodsRepository = goodsRepository;
         _sessionService = sessionService;
+        _logger = logger;
     }
     
     private async Task ValidateSessionAsync(string sessionId)
@@ -48,13 +50,18 @@ public class GoodsService : IGoodsService
         int secondsPassed = (int)(nowUtc - lastRegenTime).TotalSeconds;
         int regenAmount = secondsPassed / regenIntervalSeconds;
 
+        _logger.LogInformation($"현재 AP : {currentActionPoint} / MaxAP: {maxActionPoint}");
+        
         if (regenAmount > 0 && currentActionPoint < maxActionPoint)
         {
             int apToAdd = Math.Min(regenAmount, maxActionPoint - currentActionPoint);
             currentActionPoint += apToAdd;
-            data.ActionPoint = currentActionPoint;
             data.LastActionPointUpdated = lastRegenTime.AddSeconds(apToAdd * regenIntervalSeconds);
+            data.ActionPoint = currentActionPoint;
 
+            _logger.LogInformation($"AP 증가: {apToAdd}, 새 AP: {currentActionPoint}");
+            _logger.LogInformation($"LastActionPointUpdated 갱신: {data.LastActionPointUpdated}");
+            
             await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
         }
 
