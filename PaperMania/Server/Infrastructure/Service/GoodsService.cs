@@ -72,7 +72,7 @@ public class GoodsService : IGoodsService
 
         var nowUtc = DateTime.UtcNow;
 
-        int regenIntervalSeconds = 120;
+        int regenIntervalSeconds = 240;
         int secondsPassed = (int)(nowUtc - lastRegenTime).TotalSeconds;
         int regenAmount = secondsPassed / regenIntervalSeconds;
 
