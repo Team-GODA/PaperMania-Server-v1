@@ -67,7 +67,7 @@ namespace Server.Api.Controller
             }
         }
 
-        [HttpPost("action-point")]
+        [HttpPatch("action-point")]
         public async Task<IActionResult> UsePlayerActionPoint(
             [FromBody] UsePlayerActionPointRequest request)
         {
@@ -112,6 +112,32 @@ namespace Server.Api.Controller
             catch (Exception ex)
             {
                 _logger.LogError(ex, "플레이어 골드 조회 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpPatch("gold/{id}")]
+        public async Task<IActionResult> UsePlayerGold(
+            [FromRoute(Name = "id")] int userId,
+            [FromBody] UsePlayerGoldRequest request)
+        {
+            _logger.LogInformation($"플레이어 골드 사용 시도 : Id : {request.Id}");
+            var sessionId = HttpContext.Items["SessionId"] as string;
+            
+            try
+            {
+                await _goodsService.UsePlayerGoldAsync(request.Id, request.UsedGold, sessionId);
+                var currentGold = await _goodsService.GetPlayerGoldAsync(request.Id, sessionId);
+                
+                _logger.LogInformation($"플레이어 골드 사용 성공: Id : {request.Id} 사용 골드 : {request.UsedGold}");
+                return Ok(new
+                {
+                    CurrentGold = currentGold
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 골드 사용 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }

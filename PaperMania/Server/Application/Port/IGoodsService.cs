@@ -9,4 +9,5 @@ public interface IGoodsService
     Task UsePlayerActionPointAsync(int userId, int usedActionPoint, string sessionId);
     
     Task<int> GetPlayerGoldAsync(int userId, string sessionId);
+    Task UsePlayerGoldAsync(int userId, int usedGold, string sessionId);
 }

@@ -72,6 +72,16 @@ public class GoodsService : IGoodsService
         return data.Gold;
     }
 
+    public async Task UsePlayerGoldAsync(int userId, int usedGold, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        
+        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        data.Gold = Math.Max(data.Gold - usedGold, 0);
+        
+        await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+    }
+
     private async Task<bool> RegenerateActionPointAsync(PlayerGoodsData data)
     {
         var currentActionPoint = data.ActionPoint;
