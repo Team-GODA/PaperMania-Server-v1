@@ -1,4 +1,5 @@
-﻿using Server.Application.Port;
+﻿using Google.Apis.Auth.OAuth2.Web;
+using Server.Application.Port;
 
 namespace Server.Infrastructure.Service;
 
@@ -32,13 +33,28 @@ public class SessionService : ISessionService
         return Guid.NewGuid().ToString();
     }
 
-    public async Task<bool> ValidateSessionAsync(string sessionId)
+    public async Task<bool> ValidateSessionAsync(string sessionId, int? userId = null)
     {
         var exists = await _cacheService.ExistsAsync(sessionId);
+        if (!exists)
+        {
+            _logger.LogWarning($"세션 존재하지 않음: SessionId={sessionId}");
+            return false;
+        }
         
-        _logger.LogInformation($"[ValidateSessionAsync] 세션 유효성 검사: SessionId={sessionId}, Exists={exists}");
+        _logger.LogInformation($"세션 유효성 검사: SessionId={sessionId}, Exists={exists}");
+
+        if (userId.HasValue)
+        {
+            var storedUserId = await GetUserIdBySessionIdAsync(sessionId);
+            if (storedUserId != userId)
+            {
+                _logger.LogWarning($"유저 검증 실패: Id ; {storedUserId} != {userId}");
+                return false;
+            }
+        }
         
-        return exists;
+        return true;
     }
 
     public async Task<int?> GetUserIdBySessionIdAsync(string sessionId)
