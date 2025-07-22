@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
+using Server.Api.Filter;
 using Server.Application.Port;
 
 namespace Server.Api.Controller
 {
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ServiceFilter(typeof(SessionValidationFilter))]
     public class GoodsController : ControllerBase
     {
         private readonly IGoodsService _goodsService;
@@ -17,26 +19,13 @@ namespace Server.Api.Controller
             _logger = logger;
         }
         
-        private bool CheckSessionId(string sessionId)
-        {
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                _logger.LogWarning("세션 Id가 없습니다.");
-                return false;
-            }
-            return true;
-        }
-        
         [HttpGet("action-point/{id}")]
         public async Task<IActionResult> GetPlayerCurrentActionPointById(
-            [FromHeader(Name = "Session-Id")] string sessionId,
             [FromRoute(Name = "id")] int userId)
         {
             _logger.LogInformation($"플레이어 AP 조회 시도 : Id : {userId}");
+            var sessionId = HttpContext.Items["SessionId"] as string;
             
-            if (!CheckSessionId(sessionId))
-                return Unauthorized(new { message = "세션 ID가 없습니다." });
-
             try
             {
                 var currentActionPoint = await _goodsService.GetPlayerActionPointAsync(userId, sessionId);
@@ -56,19 +45,43 @@ namespace Server.Api.Controller
 
         [HttpPost("action-point/max")]
         public async Task<IActionResult> UpdatePlayerMaxActionPoint(
-            [FromHeader(Name = "Session-Id")] string sessionId,
             [FromBody] UpdatePlayerMaxActionPointRequest request)
         {
             _logger.LogInformation($"플레이어 최대 AP 갱신 시도");
-
+            var sessionId = HttpContext.Items["SessionId"] as string;
+            
             try
             {
-                var newMaxActionPoint = await _goodsService.UpdatePlayerMaxActionPoint(request.Id, request.NewMaxActionPoint,sessionId);
+                var newMaxActionPoint = await _goodsService.UpdatePlayerMaxActionPoint(request.Id, request.NewMaxActionPoint, sessionId);
                 
                 _logger.LogInformation($"플레이어 최대 AP 갱신 성공 : Id : {request.Id}");
                 return Ok(new
                 {
                     newMaxActionPoint
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 최대 AP 갱신 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpPost("action-point")]
+        public async Task<IActionResult> UpdatePlayerActionPoint(
+            [FromBody] UpdatePlayerActionPointRequest request)
+        {
+            _logger.LogInformation($"플레이어 AP 갱신 시도 : Id : {request.Id}");
+            var sessionId = HttpContext.Items["SessionId"] as string;
+            
+            try
+            {
+                var newActionPoint = await _goodsService.UpdatePlayerActionPointAsync(request.Id, request.NewActionPoint, sessionId);
+                
+                _logger.LogInformation($"플레이어 AP 갱신 성공 : Id : {request.Id}");
+                return Ok(new
+                {
+                    newActionPoint
                 });
             }
             catch (Exception ex)

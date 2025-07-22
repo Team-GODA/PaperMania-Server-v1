@@ -32,7 +32,39 @@ public class GoodsService : IGoodsService
         await ValidateSessionAsync(sessionId);
         
         var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        var updated = await RegenerateActionPointAsync(data);
 
+        if (updated)
+            _logger.LogInformation($"AP 자동 회복 적용: UserId={userId}, AP={data.ActionPoint}");
+
+        return data.ActionPoint;
+    }
+
+    public async Task<int> UpdatePlayerMaxActionPoint(int userId, int newMaxActionPoint, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        
+        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        data.MaxActionPoint = newMaxActionPoint;
+
+        await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+        return newMaxActionPoint;
+    }
+
+    public async Task<int> UpdatePlayerActionPointAsync(int userId, int newActionPoint, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        
+        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        data.ActionPoint = newActionPoint;
+        data.LastActionPointUpdated = DateTime.UtcNow;
+        
+        await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+        return newActionPoint;
+    }
+
+    private async Task<bool> RegenerateActionPointAsync(PlayerGoodsData data)
+    {
         var currentActionPoint = data.ActionPoint;
         var maxActionPoint = data.MaxActionPoint;
         var lastRegenTime = data.LastActionPointUpdated;
@@ -56,30 +88,9 @@ public class GoodsService : IGoodsService
             _logger.LogInformation($"LastActionPointUpdated 갱신: {data.LastActionPointUpdated}");
 
             await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+            return true;
         }
 
-        return data.ActionPoint;
-    }
-
-    public async Task<int> UpdatePlayerMaxActionPoint(int userId, int newMaxActionPoint, string sessionId)
-    {
-        await ValidateSessionAsync(sessionId);
-        
-        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
-        data.MaxActionPoint = newMaxActionPoint;
-
-        await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
-        return newMaxActionPoint;
-    }
-
-    public async Task<int> UpdatePlayerActionPointAsync(int userId, int newActionPoint, string sessionId)
-    {
-        await ValidateSessionAsync(sessionId);
-        
-        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
-        data.ActionPoint = newActionPoint;
-        
-        await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
-        return newActionPoint;
+        return false;
     }
 }

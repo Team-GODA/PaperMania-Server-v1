@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Server.Api.Filter;
 using Server.Api.Middleware;
 using Server.Application.Port;
 using Server.Infrastructure.Repository;
@@ -25,6 +26,7 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped<IGoodsService, GoodsService>();
+builder.Services.AddScoped<SessionValidationFilter>();
 
 var keyName = "DbConnectionString";
 
