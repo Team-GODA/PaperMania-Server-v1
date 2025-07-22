@@ -7,4 +7,6 @@ public interface IGoodsService
     Task<int> GetPlayerActionPointAsync(int userId, string sessionId);
     Task<int> UpdatePlayerMaxActionPoint(int userId, int newMaxActionPoint, string sessionId);
     Task UsePlayerActionPointAsync(int userId, int usedActionPoint, string sessionId);
+    
+    Task<int> GetPlayerGoldAsync(int userId, string sessionId);
 }

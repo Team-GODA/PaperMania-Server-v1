@@ -68,10 +68,10 @@ namespace Server.Api.Controller
         }
 
         [HttpPost("action-point")]
-        public async Task<IActionResult> UpdatePlayerActionPoint(
+        public async Task<IActionResult> UsePlayerActionPoint(
             [FromBody] UsePlayerActionPointRequest request)
         {
-            _logger.LogInformation($"플레이어 AP 갱신 시도 : Id : {request.Id}");
+            _logger.LogInformation($"플레이어 AP 사용 시도 : Id : {request.Id}");
             var sessionId = HttpContext.Items["SessionId"] as string;
             
             try
@@ -79,7 +79,7 @@ namespace Server.Api.Controller
                 await _goodsService.UsePlayerActionPointAsync(request.Id, request.UsedActionPoint, sessionId);
                 var currentActionPoint = await _goodsService.GetPlayerActionPointAsync(request.Id, sessionId);
 
-                _logger.LogInformation($"플레이어 AP 갱신 성공 : Id : {request.Id}");
+                _logger.LogInformation($"플레이어 AP 사용 성공 : Id : {request.Id}");
                 return Ok(new
                 {
                     CurrentActionPoint = currentActionPoint
@@ -87,7 +87,31 @@ namespace Server.Api.Controller
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "플레이어 최대 AP 갱신 중 오류 발생");
+                _logger.LogError(ex, "플레이어 AP 사용 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpGet("gold/{id}")]
+        public async Task<IActionResult> GetPlayerGold(
+            [FromRoute(Name = "id")] int userId)
+        {
+            _logger.LogInformation($"플레이어 골드 조회 시도 : Id : {userId}");
+            var sessionId = HttpContext.Items["SessionId"] as string;
+            
+            try
+            {
+                var gold = await _goodsService.GetPlayerGoldAsync(userId, sessionId);
+                
+                _logger.LogInformation($"플레이어 골드 조회 성공 : Id {userId}");
+                return Ok(new
+                {
+                    gold
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 골드 조회 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }

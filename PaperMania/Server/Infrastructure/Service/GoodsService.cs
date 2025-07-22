@@ -64,6 +64,14 @@ public class GoodsService : IGoodsService
         await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
     }
 
+    public async Task<int> GetPlayerGoldAsync(int userId, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        
+        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        return data.Gold;
+    }
+
     private async Task<bool> RegenerateActionPointAsync(PlayerGoodsData data)
     {
         var currentActionPoint = data.ActionPoint;
