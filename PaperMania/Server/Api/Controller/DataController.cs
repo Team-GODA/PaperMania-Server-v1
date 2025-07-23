@@ -62,7 +62,7 @@ namespace Server.Api.Controller
             try
             {
                  var id = userId;
-                var playerName = await _dataService.GetPlayerNameByUserIdAsync(userId, sessionId);
+                var playerName = await _dataService.GetPlayerNameByUserIdAsync(userId);
                 
                 _logger.LogInformation($"플레이어 이름 조회 성공: PlayerName: {playerName}");
                 return Ok(new
@@ -91,7 +91,7 @@ namespace Server.Api.Controller
                 if (request.NewName == null)
                     return Conflict(new { message = "플레이어 이름 재설정 실패 : NewName 누락 오류" });
                 
-                await _dataService.RenamePlayerNameAsync(userId, request.NewName, sessionId);
+                await _dataService.RenamePlayerNameAsync(userId, request.NewName);
                 
                 _logger.LogInformation($"플레이어 이름 재설정 성공: Id: {userId}, NewName: {request.NewName}");
                 return Ok(new { newName = request.NewName });
@@ -112,8 +112,8 @@ namespace Server.Api.Controller
 
             try
             {
-                var level = await _dataService.GetPlayerLevelByUserIdAsync(userId, sessionId);
-                var exp = await _dataService.GetPlayerExpByUserIdAsync(userId, sessionId);
+                var level = await _dataService.GetPlayerLevelByUserIdAsync(userId);
+                var exp = await _dataService.GetPlayerExpByUserIdAsync(userId);
                 
                 _logger.LogInformation($"플레이어 레벨 조회 성공: PlayerLevel: {level}");
                 return Ok(new
@@ -141,7 +141,7 @@ namespace Server.Api.Controller
             try
             {
                 var data =
-                    await _dataService.UpdatePlayerLevelAsync(userId, request.NewLevel, request.NewExp, sessionId);
+                    await _dataService.UpdatePlayerLevelAsync(userId, request.NewLevel, request.NewExp);
 
                 var newLevel = data.PlayerLevel;
                 var newExp = data.PlayerExp;
@@ -157,54 +157,6 @@ namespace Server.Api.Controller
             catch (Exception ex)
             {
                 _logger.LogError(ex, "플레이어 레벨 갱신 중 오류 발생");
-                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
-            }
-        }
-
-        [HttpGet("character/{id}")]
-        public async Task<IActionResult> GetPlayerCharacterById(
-            [FromRoute(Name = "id")] int userId)
-        {
-            _logger.LogInformation($"플레이어 보유 캐릭터 데이터 조회 시도: ID: {userId}");
-            var sessionId = HttpContext.Items["SessionId"] as string;
-            
-            try
-            {
-                var data = await _dataService.GetPlayerCharacterDataByUserIdAsync(userId, sessionId);
-
-                _logger.LogInformation($"플레이어 보유 캐릭터 데이터 조회 성공: ID: {userId}");
-                return Ok(data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "플레이어 보유 캐릭터 조회 중 오류 발생");
-                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
-            }
-        }
-
-        [HttpPost("character")]
-        public async Task<IActionResult> AddPlayerCharacterById(
-            [FromBody] AddPlayerCharacterRequest request)
-        {
-            _logger.LogInformation($"플레이어 보유 캐릭터 추가 시도: Id: {request.Id}, CharacterId: {request.CharacterId}");
-            var sessionId = HttpContext.Items["SessionId"] as string;
-            
-            try
-            {
-                var data = new PlayerCharacterData
-                {
-                    Id = request.Id,
-                    CharacterId = request.CharacterId
-                };
-
-                var addedCharacter = await _dataService.AddPlayerCharacterDataByUserIdAsync(data, sessionId);
-                
-                _logger.LogInformation($"플레이어 보유 캐릭터 추가 성공: Id: {request.Id}, CharacterId: {request.CharacterId}");
-                return Ok(addedCharacter);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "플레이어 캐릭터 추가 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }
