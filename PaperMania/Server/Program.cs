@@ -51,6 +51,20 @@ builder.Services.AddScoped<ICurrencyRepository>(provider =>
 
     return new CurrencyRepository(connectionString!);
 });
+builder.Services.AddScoped<IStageRepository>(provider =>
+{
+    var config = provider.GetRequiredService<IConfiguration>();
+    var connectionString = config[keyName];
+
+    return new StageRepository(connectionString!);
+});
+builder.Services.AddScoped<IRewardRepository>(provider =>
+{
+    var config = provider.GetRequiredService<IConfiguration>();
+    var connectionString = config[keyName];
+
+    return new RewardRepository(connectionString!);
+});
 
 builder.Services.AddControllers();
 

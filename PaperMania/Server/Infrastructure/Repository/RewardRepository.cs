@@ -6,7 +6,7 @@ namespace Server.Infrastructure.Repository;
 
 public class RewardRepository : RepositoryBase, IRewardRepository
 {
-    protected RewardRepository(string connectionString) : base(connectionString)
+    public RewardRepository(string connectionString) : base(connectionString)
     {
     }
 
