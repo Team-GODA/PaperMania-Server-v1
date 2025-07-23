@@ -19,15 +19,13 @@ public class CurrencyService : ICurrencyService
     private async Task ValidateSessionAsync(string sessionId)
     {
         var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
-        if (userId == null)
-            throw new Exception($"세션 ID에 맞는 유저 ID가 없습니다. : Id : {userId}");
 
-        var isValid = await _sessionService.ValidateSessionAsync(sessionId, userId.Value);
+        var isValid = await _sessionService.ValidateSessionAsync(sessionId, userId);
         if (!isValid)
             throw new UnauthorizedAccessException("세션이 유효하지 않습니다.");
     }
     
-    public async Task<int> GetPlayerActionPointAsync(int? userId, string sessionId)
+    public async Task<int> GetPlayerActionPointAsync(int userId, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
         
@@ -40,7 +38,7 @@ public class CurrencyService : ICurrencyService
         return data.ActionPoint;
     }
 
-    public async Task<int> UpdatePlayerMaxActionPoint(int? userId, int newMaxActionPoint, string sessionId)
+    public async Task<int> UpdatePlayerMaxActionPoint(int userId, int newMaxActionPoint, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
         
@@ -51,7 +49,7 @@ public class CurrencyService : ICurrencyService
         return newMaxActionPoint;
     }
 
-    public async Task UsePlayerActionPointAsync(int? userId, int usedActionPoint, string sessionId)
+    public async Task UsePlayerActionPointAsync(int userId, int usedActionPoint, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
 
@@ -64,7 +62,7 @@ public class CurrencyService : ICurrencyService
         await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
     }
 
-    public async Task<int> GetPlayerGoldAsync(int? userId, string sessionId)
+    public async Task<int> GetPlayerGoldAsync(int userId, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
         
@@ -72,7 +70,7 @@ public class CurrencyService : ICurrencyService
         return data.Gold;
     }
 
-    public async Task AddPlayerGoldAsync(int? userId, int gold, string sessionId)
+    public async Task AddPlayerGoldAsync(int userId, int gold, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
         
@@ -82,7 +80,7 @@ public class CurrencyService : ICurrencyService
         await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
     }
 
-    public async Task UsePlayerGoldAsync(int? userId, int usedGold, string sessionId)
+    public async Task UsePlayerGoldAsync(int userId, int usedGold, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
         
