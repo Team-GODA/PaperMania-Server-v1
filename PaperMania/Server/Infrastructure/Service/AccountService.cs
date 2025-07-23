@@ -48,11 +48,11 @@ public class AccountService : IAccountService
     {
         var user = await _repository.GetAccountDataByPlayerIdAsync(playerId);
         if (user == null) 
-            return string.Empty;
+            return null;
         
         bool isVerified = BCrypt.Net.BCrypt.Verify(password, user.Password);
         if (!isVerified)
-            return string.Empty;
+            return null;
 
         var sessionId = await _sessionService.CreateSessionAsync(user.Id);
         
@@ -62,10 +62,8 @@ public class AccountService : IAccountService
     public async Task<bool> LogoutAsync(string sessionId)
     {
         var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
-        if (userId == null)
-            return false;
         
-        var isVaild = await _sessionService.ValidateSessionAsync(sessionId, userId.Value);
+        var isVaild = await _sessionService.ValidateSessionAsync(sessionId, userId);
         if (!isVaild)
             return false;
         
@@ -94,6 +92,7 @@ public class AccountService : IAccountService
                     Password = "",
                     Role = "user",
                     Email = payload.Email,
+                    IsNewAccount = true,    
                     CreatedAt = DateTime.UtcNow
                 });
             }

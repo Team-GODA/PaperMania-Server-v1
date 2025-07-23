@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Application.Port;
 using System.Linq;
+using Server.Api.Filter;
 using Server.Domain.Entity;
 
 namespace Server.Api.Controller
 {
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ServiceFilter(typeof(SessionValidationFilter))]
     public class DataController : ControllerBase
     {
         private readonly IDataService _dataService;
@@ -19,25 +21,12 @@ namespace Server.Api.Controller
             _logger = logger;
         }
 
-        private bool CheckSessionId(string sessionId)
-        {
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                _logger.LogWarning("세션 Id가 없습니다.");
-                return false;
-            }
-            return true;
-        }
-
         [HttpPost("player")]
         public async Task<IActionResult> AddPlayerData(
-            [FromHeader(Name = "Session-Id")] string sessionId,
             [FromBody] AddPlayerDataRequest request)
         {
             _logger.LogInformation($"플레이어 이름 등록 시도: PlayerName = {request.PlayerName}");
-            
-            if (!CheckSessionId(sessionId))
-                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            var sessionId = HttpContext.Items["SessionId"] as string;
 
             try
             {
@@ -65,13 +54,10 @@ namespace Server.Api.Controller
         
         [HttpGet("name/{id}")]
         public async Task<IActionResult> GetPlayerNameById(
-            [FromHeader(Name = "Session-Id")] string sessionId,
             [FromRoute(Name = "id")] int userId)
         {
             _logger.LogInformation($"플레이어 이름 조회 시도: Id: {userId}");
-
-            if (!CheckSessionId(sessionId))
-                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            var sessionId = HttpContext.Items["SessionId"] as string;
 
             try
             {
@@ -94,14 +80,11 @@ namespace Server.Api.Controller
 
         [HttpPatch("name/{id}")]
         public async Task<IActionResult> RenamePlayerName(
-            [FromHeader(Name = "Session-Id")] string sessionId,
             [FromRoute(Name = "id")] int userId, 
             [FromBody] RenamePlayerNameRequest request)
         {
             _logger.LogInformation($"플레이어 이름 재설정 시도: Id: {userId}");
-
-            if (!CheckSessionId(sessionId))
-                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            var sessionId = HttpContext.Items["SessionId"] as string;
             
             try
             {
@@ -122,13 +105,10 @@ namespace Server.Api.Controller
 
         [HttpGet("level/{id}")]
         public async Task<IActionResult> GetPlayerLevelById(
-            [FromHeader(Name = "Session-Id")] string sessionId,
             [FromRoute(Name = "id")] int userId)
         {
             _logger.LogInformation($"플레이어 레벨 조회 시도: Id: {userId}");
-
-            if (!CheckSessionId(sessionId))
-                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            var sessionId = HttpContext.Items["SessionId"] as string;
 
             try
             {
@@ -152,14 +132,11 @@ namespace Server.Api.Controller
 
         [HttpPost("level/{id}")]
         public async Task<IActionResult> UpdatePlayerLevel(
-            [FromHeader(Name = "Session-Id")] string sessionId,
             [FromRoute(Name = "id")] int userId,
             [FromBody] UpdatePlayerLevelRequest request)
         {
             _logger.LogInformation($"플레이어 레벨 갱신 시도: Id: {userId}, 갱신 레벨: {request.NewLevel}, 갱신 Exp: {request.NewExp}");
-
-            if (!CheckSessionId(sessionId))
-                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            var sessionId = HttpContext.Items["SessionId"] as string;
             
             try
             {
@@ -186,13 +163,10 @@ namespace Server.Api.Controller
 
         [HttpGet("character/{id}")]
         public async Task<IActionResult> GetPlayerCharacterById(
-            [FromHeader(Name = "Session-Id")] string sessionId,
             [FromRoute(Name = "id")] int userId)
         {
             _logger.LogInformation($"플레이어 보유 캐릭터 데이터 조회 시도: ID: {userId}");
-
-            if (!CheckSessionId(sessionId))
-                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            var sessionId = HttpContext.Items["SessionId"] as string;
             
             try
             {
@@ -210,13 +184,10 @@ namespace Server.Api.Controller
 
         [HttpPost("character")]
         public async Task<IActionResult> AddPlayerCharacterById(
-            [FromHeader(Name = "Session-Id")] string sessionId,
             [FromBody] AddPlayerCharacterRequest request)
         {
             _logger.LogInformation($"플레이어 보유 캐릭터 추가 시도: Id: {request.Id}, CharacterId: {request.CharacterId}");
-
-            if (!CheckSessionId(sessionId))
-                return Unauthorized(new { message = "세션 ID가 없습니다." });
+            var sessionId = HttpContext.Items["SessionId"] as string;
             
             try
             {

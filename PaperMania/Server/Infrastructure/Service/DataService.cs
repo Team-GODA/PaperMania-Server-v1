@@ -7,13 +7,16 @@ public class DataService : IDataService
 {
     private readonly IDataRepository _dataRepository;
     private readonly IAccountRepository _accountRepository;
+    private readonly ICurrencyRepository _currencyRepository;
     private readonly ISessionService _sessionService;
     private readonly ILogger<DataService> _logger;
 
-    public DataService(IDataRepository dataRepository, IAccountRepository accountRepository, ISessionService sessionService, ILogger<DataService> logger)
+    public DataService(IDataRepository dataRepository, IAccountRepository accountRepository
+        ,ICurrencyRepository currencyRepository, ISessionService sessionService, ILogger<DataService> logger)
     {
         _dataRepository = dataRepository;
         _accountRepository = accountRepository;
+        _currencyRepository = currencyRepository;
         _sessionService = sessionService;
         _logger = logger;
     }
@@ -39,6 +42,7 @@ public class DataService : IDataService
         }
         
         await _dataRepository.AddPlayerDataAsync(userId, playerName);
+        await _currencyRepository.AddPlayerGoodsDataByUserIdAsync(userId);
         await _accountRepository.UpdateIsNewAccountAsync(userId, false);
         
         return playerName;
@@ -114,13 +118,19 @@ public class DataService : IDataService
         await _dataRepository.RenamePlayerNameAsync(userId, newPlayerName);
     }
 
+    public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+
+        return data;
+    }
+
     private async Task ValidateSessionAsync(string sessionId)
     {
         var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
-        if (userId == null)
-            throw new Exception($"세션 ID에 맞는 유저 ID가 없습니다. : Id : {userId}");
         
-        var isValid = await _sessionService.ValidateSessionAsync(sessionId, userId.Value);
+        var isValid = await _sessionService.ValidateSessionAsync(sessionId, userId);
         if (!isValid)
             throw new UnauthorizedAccessException("세션이 유효하지 않습니다.");
     }
