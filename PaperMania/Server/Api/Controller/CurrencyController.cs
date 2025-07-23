@@ -11,20 +11,23 @@ namespace Server.Api.Controller
     public class CurrencyController : ControllerBase
     {
         private readonly ICurrencyService _currencyService;
+        private readonly ISessionService _sessionService;
         private readonly ILogger<CurrencyController> _logger;
 
-        public CurrencyController(ICurrencyService currencyService, ILogger<CurrencyController> logger)
+        public CurrencyController(ICurrencyService currencyService,ISessionService sessionService, ILogger<CurrencyController> logger)
         {
             _currencyService = currencyService;
+            _sessionService = sessionService;
             _logger = logger;
         }
         
-        [HttpGet("action-point/{id}")]
-        public async Task<IActionResult> GetPlayerCurrentActionPointById(
-            [FromRoute(Name = "id")] int userId)
+        [HttpGet("action-point")]
+        public async Task<IActionResult> GetPlayerCurrentActionPointById()
         {
-            _logger.LogInformation($"플레이어 AP 조회 시도 : Id : {userId}");
             var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
+            
+            _logger.LogInformation($"플레이어 AP 조회 시도 : Id : {userId}");
             
             try
             {
@@ -47,14 +50,16 @@ namespace Server.Api.Controller
         public async Task<IActionResult> UpdatePlayerMaxActionPoint(
             [FromBody] UpdatePlayerMaxActionPointRequest request)
         {
-            _logger.LogInformation($"플레이어 최대 AP 갱신 시도");
             var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
+            
+            _logger.LogInformation($"플레이어 최대 AP 갱신 시도");
             
             try
             {
-                var newMaxActionPoint = await _currencyService.UpdatePlayerMaxActionPoint(request.Id, request.NewMaxActionPoint, sessionId);
+                var newMaxActionPoint = await _currencyService.UpdatePlayerMaxActionPoint(userId, request.NewMaxActionPoint, sessionId);
                 
-                _logger.LogInformation($"플레이어 최대 AP 갱신 성공 : Id : {request.Id}");
+                _logger.LogInformation($"플레이어 최대 AP 갱신 성공 : Id : {userId}");
                 return Ok(new
                 {
                     newMaxActionPoint
@@ -71,15 +76,17 @@ namespace Server.Api.Controller
         public async Task<IActionResult> UsePlayerActionPoint(
             [FromBody] UsePlayerActionPointRequest request)
         {
-            _logger.LogInformation($"플레이어 AP 사용 시도 : Id : {request.Id}");
             var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
+            
+            _logger.LogInformation($"플레이어 AP 사용 시도 : Id : {userId}");
             
             try
             {
-                await _currencyService.UsePlayerActionPointAsync(request.Id, request.UsedActionPoint, sessionId);
-                var currentActionPoint = await _currencyService.GetPlayerActionPointAsync(request.Id, sessionId);
+                await _currencyService.UsePlayerActionPointAsync(userId, request.UsedActionPoint, sessionId);
+                var currentActionPoint = await _currencyService.GetPlayerActionPointAsync(userId, sessionId);
 
-                _logger.LogInformation($"플레이어 AP 사용 성공 : Id : {request.Id}");
+                _logger.LogInformation($"플레이어 AP 사용 성공 : Id : {userId}");
                 return Ok(new
                 {
                     CurrentActionPoint = currentActionPoint
@@ -92,12 +99,13 @@ namespace Server.Api.Controller
             }
         }
 
-        [HttpGet("gold/{id}")]
-        public async Task<IActionResult> GetPlayerGold(
-            [FromRoute(Name = "id")] int userId)
+        [HttpGet("gold")]
+        public async Task<IActionResult> GetPlayerGold()
         {
-            _logger.LogInformation($"플레이어 골드 조회 시도 : Id : {userId}");
             var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
+            
+            _logger.LogInformation($"플레이어 골드 조회 시도 : Id : {userId}");
             
             try
             {
@@ -116,17 +124,19 @@ namespace Server.Api.Controller
             }
         }
 
-        [HttpPatch("gold/use")]
+        [HttpPatch("gold")]
         public async Task<IActionResult> UsePlayerGold(
             [FromBody] UsePlayerGoldRequest request)
         {
-            _logger.LogInformation($"플레이어 골드 사용 시도 : Id : {request.Id}");
             var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
+            
+            _logger.LogInformation($"플레이어 골드 사용 시도 : Id : {userId}");
             
             try
             {
-                await _currencyService.UsePlayerGoldAsync(request.Id, request.UsedGold, sessionId);
-                var currentGold = await _currencyService.GetPlayerGoldAsync(request.Id, sessionId);
+                await _currencyService.UsePlayerGoldAsync(userId, request.UsedGold, sessionId);
+                var currentGold = await _currencyService.GetPlayerGoldAsync(userId, sessionId);
                 
                 _logger.LogInformation($"플레이어 골드 사용 성공: Id : {request.Id} 사용 골드 : {request.UsedGold}");
                 return Ok(new
