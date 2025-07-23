@@ -10,7 +10,7 @@ public class RewardRepository : RepositoryBase, IRewardRepository
     {
     }
 
-    public async Task<StageReward?> GetStageRewardByUserIdAsync(int userId, StageReward reward)
+    public async Task<StageReward?> GetStageRewardByUserIdAsync(int userId, int stageNum, int stageSubNum)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
@@ -32,8 +32,8 @@ public class RewardRepository : RepositoryBase, IRewardRepository
         var result = await db.QueryFirstOrDefaultAsync<StageReward>(sql, new
         {
             UserId  = userId,
-            StageNum = reward.StageNum,
-            SubStageNum = reward.SubStageNum
+            StageNum = stageNum,
+            SubStageNum = stageSubNum
         });
         
         return result;

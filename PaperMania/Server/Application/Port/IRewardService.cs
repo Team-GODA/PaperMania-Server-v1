@@ -2,7 +2,7 @@
 
 namespace Server.Application.Port;
 
-public interface IRewardRepository
+public interface IRewardService
 {
     Task<StageReward?> GetStageRewardByUserIdAsync(int userId, int stageNum, int stageSubNum);
 }
