@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Server.Api.Filter;
 using Server.Api.Middleware;
 using Server.Application.Port;
 using Server.Infrastructure.Repository;
@@ -24,6 +25,8 @@ builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDataService, DataService>();
+builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+builder.Services.AddScoped<SessionValidationFilter>();
 
 var keyName = "DbConnectionString";
 
@@ -40,6 +43,13 @@ builder.Services.AddScoped<IDataRepository>(provider =>
     var connectionString = config[keyName];
 
     return new DataRepository(connectionString!);
+});
+builder.Services.AddScoped<ICurrencyRepository>(provider =>
+{
+    var config = provider.GetRequiredService<IConfiguration>();
+    var connectionString = config[keyName];
+
+    return new CurrencyRepository(connectionString!);
 });
 
 builder.Services.AddControllers();

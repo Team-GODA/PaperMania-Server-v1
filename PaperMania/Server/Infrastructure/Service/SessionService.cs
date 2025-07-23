@@ -57,7 +57,7 @@ public class SessionService : ISessionService
         return true;
     }
 
-    public async Task<int?> GetUserIdBySessionIdAsync(string sessionId)
+    public async Task<int> GetUserIdBySessionIdAsync(string sessionId)
     {
         var value = await _cacheService.GetAsync(sessionId);
         
@@ -69,7 +69,7 @@ public class SessionService : ISessionService
         else
         {
             _logger.LogWarning($"[GetUserIdBySessionIdAsync] 세션으로부터 UserId 조회 실패: SessionId={sessionId}");
-            return null;
+            return -1;
         }
     }
 
