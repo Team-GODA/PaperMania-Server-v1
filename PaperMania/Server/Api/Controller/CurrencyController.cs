@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Api.Filter;
@@ -22,7 +23,7 @@ namespace Server.Api.Controller
         }
         
         [HttpGet("action-point")]
-        public async Task<IActionResult> GetPlayerCurrentActionPointById()
+        public async Task<IActionResult> GetPlayerActionPointById()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
             int userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
@@ -147,7 +148,6 @@ namespace Server.Api.Controller
                 }
                 
                 var currentGold = await _currencyService.GetPlayerGoldAsync(userId, sessionId!);
-                _logger.LogInformation($"플레이어 골드 업데이트 성공: Id={userId}, CurrentGold={currentGold}");
                 return Ok(new
                 {
                     CurrentGold = currentGold
@@ -156,6 +156,66 @@ namespace Server.Api.Controller
             catch (Exception ex)
             {
                 _logger.LogError(ex, "플레이어 골드 업데이트 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpGet("paper-piece")]
+        public async Task<IActionResult> GetPlayerPaperPiece()
+        {
+            var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
+            
+            _logger.LogInformation($"플레이어 종이조각 조회 시도 : Id : {userId}");
+
+            try
+            {
+                var currentPaperPiece = await _currencyService.GetPlayerPaperPieceAsync(userId, sessionId!);
+
+                _logger.LogInformation($"플레이어 종이조각 조회 성공 : Id : {userId}");
+                return Ok(new
+                {
+                    currentPaperPiece = currentPaperPiece
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 종이조각 조회 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
+        }
+
+        [HttpPatch("paper-piece")]
+        public async Task<IActionResult> UpdatePlayerPaperPiece(
+            [FromBody] ModifyPaperPieceRequest request)
+        {
+            var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
+
+            _logger.LogInformation($"플레이어 종이 조각 갱신 시도 : Id : {userId}");
+            
+            try
+            {
+                if (request.Amount >= 0)
+                {
+                    _logger.LogInformation($"플레이어 종이 조각 추가 성공 : Id : {userId}");
+                    await _currencyService.AddPlayerPaperPieceAsync(userId, request.Amount, sessionId!);
+                }
+                else
+                {
+                    _logger.LogInformation($"플레이어 종이 조각 사용 성공 : Id : {userId}");
+                    await _currencyService.UsePlayerPaperPieceAsync(userId, -request.Amount, sessionId!);
+                }
+
+                var currentPaperPiece = await _currencyService.GetPlayerPaperPieceAsync(userId, sessionId!);
+                return Ok(new
+                {
+                    currentPaperPiece = currentPaperPiece
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 종이 조각 업데이트 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }
