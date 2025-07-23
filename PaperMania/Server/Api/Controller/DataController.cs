@@ -13,11 +13,13 @@ namespace Server.Api.Controller
     public class DataController : ControllerBase
     {
         private readonly IDataService _dataService;
+        private readonly ISessionService _sessionService;
         private readonly ILogger<DataController> _logger;
 
-        public DataController(IDataService dataService, ILogger<DataController> logger)
+        public DataController(IDataService dataService, ISessionService sessionService ,ILogger<DataController> logger)
         {
             _dataService = dataService;
+            _sessionService = sessionService;
             _logger = logger;
         }
 
@@ -52,12 +54,13 @@ namespace Server.Api.Controller
             }
         }
         
-        [HttpGet("name/{id}")]
-        public async Task<IActionResult> GetPlayerNameById(
-            [FromRoute(Name = "id")] int userId)
+        [HttpGet("name")]
+        public async Task<IActionResult> GetPlayerName()
         {
+            var sessionId =  HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
+            
             _logger.LogInformation($"플레이어 이름 조회 시도: Id: {userId}");
-            var sessionId = HttpContext.Items["SessionId"] as string;
 
             try
             {
@@ -78,13 +81,14 @@ namespace Server.Api.Controller
             }
         }
 
-        [HttpPatch("name/{id}")]
+        [HttpPatch("name")]
         public async Task<IActionResult> RenamePlayerName(
-            [FromRoute(Name = "id")] int userId, 
             [FromBody] RenamePlayerNameRequest request)
         {
+            var sessionId =  HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
+            
             _logger.LogInformation($"플레이어 이름 재설정 시도: Id: {userId}");
-            var sessionId = HttpContext.Items["SessionId"] as string;
             
             try
             {
@@ -103,12 +107,13 @@ namespace Server.Api.Controller
             }
         }
 
-        [HttpGet("level/{id}")]
-        public async Task<IActionResult> GetPlayerLevelById(
-            [FromRoute(Name = "id")] int userId)
+        [HttpGet("level")]
+        public async Task<IActionResult> GetPlayerLevel()
         {
-            _logger.LogInformation($"플레이어 레벨 조회 시도: Id: {userId}");
             var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
+            
+            _logger.LogInformation($"플레이어 레벨 조회 시도: Id: {userId}");
 
             try
             {
@@ -130,23 +135,24 @@ namespace Server.Api.Controller
             }
         }
 
-        [HttpPost("level/{id}")]
-        public async Task<IActionResult> UpdatePlayerLevel(
-            [FromRoute(Name = "id")] int userId,
-            [FromBody] UpdatePlayerLevelRequest request)
+        [HttpPatch("level/exp")]
+        public async Task<IActionResult> UpdatePlayerLevelByExp(
+            [FromBody] AddPlayerExpRequest request)
         {
-            _logger.LogInformation($"플레이어 레벨 갱신 시도: Id: {userId}, 갱신 레벨: {request.NewLevel}, 갱신 Exp: {request.NewExp}");
-            var sessionId = HttpContext.Items["SessionId"] as string;
+            var sessionId =  HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
+            
+            _logger.LogInformation($"플레이어 레벨 갱신 시도: Id: {userId}");
             
             try
             {
                 var data =
-                    await _dataService.UpdatePlayerLevelAsync(userId, request.NewLevel, request.NewExp);
+                    await _dataService.UpdatePlayerLevelByExpAsync(userId, request.NewExp);
 
                 var newLevel = data.PlayerLevel;
                 var newExp = data.PlayerExp;
                 
-                _logger.LogInformation($"플레이어 레벨 갱신 성공: Id: {userId}, 갱신 레벨: {request.NewLevel}, 갱신 Exp: {request.NewExp}");
+                _logger.LogInformation($"플레이어 레벨 갱신 성공: Id: {userId}");
                 return Ok(new
                 {
                     userId,
