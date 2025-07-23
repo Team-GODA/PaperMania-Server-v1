@@ -36,4 +36,25 @@ public class StageRepository : RepositoryBase, IStageRepository
         
         await db.ExecuteAsync(sql, data);
     }
+
+    public async Task<bool> IsClearedStageAsync(PlayerStageData data)
+    {
+        await using var db = CreateConnection();
+        await db.OpenAsync();
+        
+        var sql = @"
+            SELECT is_cleared AS IsCleared
+            FROM paper_mania_stage_data.player_stage_data
+            WHERE id = @Id AND stage_num = @StageNum AND stage_sub_num = @SubStageNum
+            LIMIT 1";
+        
+        var result = await db.QueryFirstOrDefaultAsync<bool?>(sql, new
+        {
+            Id = data.Id,
+            StageNum = data.StageNum,
+            SubStageNum = data.SubStageNum
+        });
+
+        return result ?? false;
+    }
 }

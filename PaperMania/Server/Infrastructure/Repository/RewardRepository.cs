@@ -28,9 +28,4 @@ public class RewardRepository : RepositoryBase, IRewardRepository
         });
         return result;
     }
-
-    public async Task<bool> IsFirstStageClearAsync(int userId)
-    {
-        throw new NotImplementedException();
-    }
 }
