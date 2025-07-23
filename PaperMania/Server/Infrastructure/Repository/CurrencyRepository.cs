@@ -22,7 +22,7 @@ public class CurrencyRepository : RepositoryBase, ICurrencyRepository
         await db.ExecuteAsync(sql, new { UserId = userId });
     }
 
-    public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId)
+    public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int? userId)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();

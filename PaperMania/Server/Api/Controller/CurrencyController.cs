@@ -126,7 +126,7 @@ namespace Server.Api.Controller
 
         [HttpPatch("gold")]
         public async Task<IActionResult> UsePlayerGold(
-            [FromBody] UsePlayerGoldRequest request)
+            [FromBody] ModifyGoldRequest request)
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
             var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
@@ -135,10 +135,10 @@ namespace Server.Api.Controller
             
             try
             {
-                await _currencyService.UsePlayerGoldAsync(userId, request.UsedGold, sessionId);
+                await _currencyService.UsePlayerGoldAsync(userId, request.Amount, sessionId);
                 var currentGold = await _currencyService.GetPlayerGoldAsync(userId, sessionId);
                 
-                _logger.LogInformation($"플레이어 골드 사용 성공: Id : {request.Id} 사용 골드 : {request.UsedGold}");
+                _logger.LogInformation($"플레이어 골드 사용 성공: Id : {userId} 사용 골드 : {request.Amount}");
                 return Ok(new
                 {
                     CurrentGold = currentGold
@@ -152,10 +152,30 @@ namespace Server.Api.Controller
         }
 
         [HttpPatch("gold/add")]
-        public Task<IActionResult> AddPlayerGold(
-            [FromBody] UsePlayerGoldRequest request)
+        public async Task<IActionResult> AddPlayerGold(
+            [FromBody] ModifyGoldRequest request)
         {
-            _logger.LogInformation($"플레이어 골드 추가 시도 : Id {request.Id}");
+            var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
+            
+            _logger.LogInformation($"플레이어 골드 추가 시도 : Id : {userId}");
+
+            try
+            {
+                await _currencyService.AddPlayerGoldAsync(userId, request.Amount, sessionId);
+                var currentGold = await _currencyService.GetPlayerGoldAsync(userId, sessionId);
+                
+                _logger.LogInformation($"플레이어 골드 추가 성공 : Id : {userId}");
+                return Ok(new
+                {
+                    CurrentGold = currentGold
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "플레이어 골드 추가 중 오류 발생");
+                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
+            }
         }
     }
 }

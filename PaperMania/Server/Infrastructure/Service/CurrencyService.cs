@@ -72,7 +72,7 @@ public class CurrencyService : ICurrencyService
         return data.Gold;
     }
 
-    public async Task AddPlayerGoldAsync(int userId, int gold, string sessionId)
+    public async Task AddPlayerGoldAsync(int? userId, int gold, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
         
