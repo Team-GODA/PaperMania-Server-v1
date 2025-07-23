@@ -23,8 +23,6 @@ public class DataService : IDataService
     
     public async Task<string> AddPlayerDataAsync(string playerName, string sessionId)
     {
-        await ValidateSessionAsync(sessionId);
-        
         var exists = await _dataRepository.ExistsPlayerNameAsync(playerName);
         if (exists != null)
         {
@@ -48,66 +46,52 @@ public class DataService : IDataService
         return playerName;
     }
 
-    public async Task<string?> GetPlayerNameByUserIdAsync(int userId, string sessionId)
+    public async Task<string?> GetPlayerNameByUserIdAsync(int userId)
     {
-        await ValidateSessionAsync(sessionId);
-        var data = await GetByPlayerByIdAsync(userId);
+        var data = await GetPlayerDataByIdAsync(userId);
 
         return data?.PlayerName;
     }
 
-    public async Task<PlayerGameData?> GetByPlayerByIdAsync(int userId)
+    public async Task<PlayerGameData?> GetPlayerDataByIdAsync(int userId)
     {
         return await _dataRepository.GetPlayerDataByIdAsync(userId);
     }
 
-    public async Task<int> GetPlayerLevelByUserIdAsync(int userId, string sessionId)
+    public async Task<int> GetPlayerLevelByUserIdAsync(int userId)
     {
-        await ValidateSessionAsync(sessionId);
         var data = await GetPlayerDataByUserId(userId);
-
         return data.PlayerLevel;
     }
 
-    public async Task<int> GetPlayerExpByUserIdAsync(int userId, string sessionId)
+    public async Task<int> GetPlayerExpByUserIdAsync(int userId)
     {
-        await ValidateSessionAsync(sessionId);
         var data = await GetPlayerDataByUserId(userId);
-
         return data.PlayerExp;
     }
 
-    public async Task<PlayerGameData> UpdatePlayerLevelAsync(int userId, int level, int exp, string sessionId)
+    public async Task<PlayerGameData> UpdatePlayerLevelByExpAsync(int userId, int exp)
     {
-        await ValidateSessionAsync(sessionId);
-        var data = await _dataRepository.UpdatePlayerLevelAsync(userId, level, exp);
-        if (data == null)
-            throw new Exception($"Id: {userId}의 플레이어 레벨 데이터가 없습니다.");
+        var playerData = await GetPlayerDataByUserId(userId);
+        playerData.PlayerExp += exp;
 
-        return data;
+        while (true)
+        {
+            var levelData = await _dataRepository.GetLevelDataAsync(playerData.PlayerLevel);
+
+            if (levelData == null || playerData.PlayerExp < levelData.MaxExp)
+                break;
+
+            playerData.PlayerExp -= levelData.MaxExp;
+            playerData.PlayerLevel++;
+        }
+
+        await _dataRepository.UpdatePlayerLevelAsync(userId, playerData.PlayerLevel, playerData.PlayerExp);
+        return playerData;
     }
 
-    public async Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int userId, string sessionId)
+    public async Task RenamePlayerNameAsync(int userId, string newPlayerName)
     {
-        await ValidateSessionAsync(sessionId);
-        return await _dataRepository.GetPlayerCharacterDataByUserIdAsync(userId);
-    }
-
-    public async Task<PlayerCharacterData> AddPlayerCharacterDataByUserIdAsync(PlayerCharacterData data, string sessionId)
-    {
-        await ValidateSessionAsync(sessionId);
-        
-        bool exists = await _dataRepository.IsNewCharacterExistAsync(data.Id, data.CharacterId);
-        if (exists)
-            throw new InvalidOperationException("이미 해당 캐릭터를 보유 중입니다.");
-        
-        return await _dataRepository.AddPlayerCharacterDataByUserIdAsync(data);
-    }
-
-    public async Task RenamePlayerNameAsync(int userId, string newPlayerName, string sessionId)
-    {
-        await ValidateSessionAsync(sessionId);
-        
         var exists = await _dataRepository.ExistsPlayerNameAsync(newPlayerName);
         if (exists != null)
         {
@@ -118,21 +102,10 @@ public class DataService : IDataService
         await _dataRepository.RenamePlayerNameAsync(userId, newPlayerName);
     }
 
-    public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId, string sessionId)
+    public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId)
     {
-        await ValidateSessionAsync(sessionId);
         var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
-
         return data;
-    }
-
-    private async Task ValidateSessionAsync(string sessionId)
-    {
-        var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
-        
-        var isValid = await _sessionService.ValidateSessionAsync(sessionId, userId);
-        if (!isValid)
-            throw new UnauthorizedAccessException("세션이 유효하지 않습니다.");
     }
 
     private async Task<PlayerGameData> GetPlayerDataByUserId(int userId)
