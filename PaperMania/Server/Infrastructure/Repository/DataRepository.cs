@@ -72,7 +72,20 @@ public class DataRepository : RepositoryBase, IDataRepository
             Id = userId
         });
     }
-    
+
+    public async Task<LevelDefinition?> GetLevelDataAsync(int currentLevel)
+    {
+        await using var db = CreateConnection();
+        await db.OpenAsync();
+
+        var sql = @"
+            SELECT level AS Level, max_exp AS MaxExp, max_action_point AS MaxActionPoint
+            FROM paper_mania_game_data.level_definition
+            WHERE level = @CurrentLevel";
+        
+        return await db.QueryFirstOrDefaultAsync<LevelDefinition>(sql, new { CurrentLevel = currentLevel });
+    }
+
     public async Task RenamePlayerNameAsync(int userId, string newPlayerName)
     {
         await using var db = CreateConnection();

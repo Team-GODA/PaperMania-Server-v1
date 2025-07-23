@@ -70,13 +70,24 @@ public class DataService : IDataService
         return data.PlayerExp;
     }
 
-    public async Task<PlayerGameData> UpdatePlayerLevelAsync(int userId, int level, int exp)
+    public async Task<PlayerGameData> UpdatePlayerLevelByExpAsync(int userId, int exp)
     {
-        var data = await _dataRepository.UpdatePlayerLevelAsync(userId, level, exp);
-        if (data == null)
-            throw new Exception($"Id: {userId}의 플레이어 레벨 데이터가 없습니다.");
+        var playerData = await GetPlayerDataByUserId(userId);
+        playerData.PlayerExp += exp;
 
-        return data;
+        while (true)
+        {
+            var levelData = await _dataRepository.GetLevelDataAsync(playerData.PlayerLevel);
+
+            if (levelData == null || playerData.PlayerExp < levelData.MaxExp)
+                break;
+
+            playerData.PlayerExp -= levelData.MaxExp;
+            playerData.PlayerLevel++;
+        }
+
+        await _dataRepository.UpdatePlayerLevelAsync(userId, playerData.PlayerLevel, playerData.PlayerExp);
+        return playerData;
     }
 
     public async Task RenamePlayerNameAsync(int userId, string newPlayerName)
