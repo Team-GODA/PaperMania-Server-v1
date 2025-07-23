@@ -10,22 +10,32 @@ public class RewardRepository : RepositoryBase, IRewardRepository
     {
     }
 
-    public async Task<StageReward?> GetStageRewardAsync(StageData stage)
+    public async Task<StageReward?> GetStageRewardByUserIdAsync(int userId, StageReward reward)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
 
         var sql = @"
-            SELECT stage_num AS StageNum, stage_sub_num AS StageSubNum, 
-                clear_paper_piece AS PaperPiece, clear_gold AS Gold, clear_exp AS ClearExp
-            FROM paper_mania_stage_data.stage_reward
-            WHERE stage_num = @StageNum AND stage_sub_num = @SubStageNum";
+            SELECT S.stage_num AS StageNum, 
+               S.stage_sub_num AS StageSubNum, 
+               S.clear_paper_piece AS PaperPiece, 
+               S.clear_gold AS Gold, 
+               S.clear_exp AS ClearExp
+        FROM paper_mania_stage_data.stage_reward S
+        JOIN paper_mania_stage_data.player_stage_data PS 
+            ON S.stage_num = PS.stage_num 
+            AND S.stage_sub_num = PS.stage_sub_num
+        WHERE PS.id = @UserId 
+          AND S.stage_num = @StageNum 
+          AND S.stage_sub_num = @SubStageNum";
 
         var result = await db.QueryFirstOrDefaultAsync<StageReward>(sql, new
         {
-            StageNum = stage.StageNum,
-            SubStageNum = stage.SubStageNum
+            UserId  = userId,
+            StageNum = reward.StageNum,
+            SubStageNum = reward.SubStageNum
         });
+        
         return result;
     }
 }
