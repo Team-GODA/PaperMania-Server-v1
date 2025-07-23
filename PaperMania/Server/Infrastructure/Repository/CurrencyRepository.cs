@@ -4,9 +4,9 @@ using Server.Domain.Entity;
 
 namespace Server.Infrastructure.Repository;
 
-public class GoodsRepository : RepositoryBase, IGoodsRepository
+public class CurrencyRepository : RepositoryBase, ICurrencyRepository
 {
-    public GoodsRepository(string connectionString) : base(connectionString)
+    public CurrencyRepository(string connectionString) : base(connectionString)
     {
     }
     

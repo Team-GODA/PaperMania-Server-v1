@@ -25,7 +25,7 @@ builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDataService, DataService>();
-builder.Services.AddScoped<IGoodsService, GoodsService>();
+builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<SessionValidationFilter>();
 
 var keyName = "DbConnectionString";
@@ -44,12 +44,12 @@ builder.Services.AddScoped<IDataRepository>(provider =>
 
     return new DataRepository(connectionString!);
 });
-builder.Services.AddScoped<IGoodsRepository>(provider =>
+builder.Services.AddScoped<ICurrencyRepository>(provider =>
 {
     var config = provider.GetRequiredService<IConfiguration>();
     var connectionString = config[keyName];
 
-    return new GoodsRepository(connectionString!);
+    return new CurrencyRepository(connectionString!);
 });
 
 builder.Services.AddControllers();

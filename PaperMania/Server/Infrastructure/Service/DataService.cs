@@ -7,16 +7,16 @@ public class DataService : IDataService
 {
     private readonly IDataRepository _dataRepository;
     private readonly IAccountRepository _accountRepository;
-    private readonly IGoodsRepository _goodsRepository;
+    private readonly ICurrencyRepository _currencyRepository;
     private readonly ISessionService _sessionService;
     private readonly ILogger<DataService> _logger;
 
     public DataService(IDataRepository dataRepository, IAccountRepository accountRepository
-        ,IGoodsRepository goodsRepository, ISessionService sessionService, ILogger<DataService> logger)
+        ,ICurrencyRepository currencyRepository, ISessionService sessionService, ILogger<DataService> logger)
     {
         _dataRepository = dataRepository;
         _accountRepository = accountRepository;
-        _goodsRepository = goodsRepository;
+        _currencyRepository = currencyRepository;
         _sessionService = sessionService;
         _logger = logger;
     }
@@ -42,7 +42,7 @@ public class DataService : IDataService
         }
         
         await _dataRepository.AddPlayerDataAsync(userId, playerName);
-        await _goodsRepository.AddPlayerGoodsDataByUserIdAsync(userId);
+        await _currencyRepository.AddPlayerGoodsDataByUserIdAsync(userId);
         await _accountRepository.UpdateIsNewAccountAsync(userId, false);
         
         return playerName;
@@ -121,7 +121,7 @@ public class DataService : IDataService
     public async Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
-        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
 
         return data;
     }

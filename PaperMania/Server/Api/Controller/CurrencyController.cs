@@ -8,14 +8,14 @@ namespace Server.Api.Controller
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     [ServiceFilter(typeof(SessionValidationFilter))]
-    public class GoodsController : ControllerBase
+    public class CurrencyController : ControllerBase
     {
-        private readonly IGoodsService _goodsService;
-        private readonly ILogger<GoodsController> _logger;
+        private readonly ICurrencyService _currencyService;
+        private readonly ILogger<CurrencyController> _logger;
 
-        public GoodsController(IGoodsService goodsService, ILogger<GoodsController> logger)
+        public CurrencyController(ICurrencyService currencyService, ILogger<CurrencyController> logger)
         {
-            _goodsService = goodsService;
+            _currencyService = currencyService;
             _logger = logger;
         }
         
@@ -28,7 +28,7 @@ namespace Server.Api.Controller
             
             try
             {
-                var currentActionPoint = await _goodsService.GetPlayerActionPointAsync(userId, sessionId);
+                var currentActionPoint = await _currencyService.GetPlayerActionPointAsync(userId, sessionId);
                 
                 _logger.LogInformation($"플레이어 AP 조회 성공 : Id : {userId}");
                 return Ok(new
@@ -52,7 +52,7 @@ namespace Server.Api.Controller
             
             try
             {
-                var newMaxActionPoint = await _goodsService.UpdatePlayerMaxActionPoint(request.Id, request.NewMaxActionPoint, sessionId);
+                var newMaxActionPoint = await _currencyService.UpdatePlayerMaxActionPoint(request.Id, request.NewMaxActionPoint, sessionId);
                 
                 _logger.LogInformation($"플레이어 최대 AP 갱신 성공 : Id : {request.Id}");
                 return Ok(new
@@ -76,8 +76,8 @@ namespace Server.Api.Controller
             
             try
             {
-                await _goodsService.UsePlayerActionPointAsync(request.Id, request.UsedActionPoint, sessionId);
-                var currentActionPoint = await _goodsService.GetPlayerActionPointAsync(request.Id, sessionId);
+                await _currencyService.UsePlayerActionPointAsync(request.Id, request.UsedActionPoint, sessionId);
+                var currentActionPoint = await _currencyService.GetPlayerActionPointAsync(request.Id, sessionId);
 
                 _logger.LogInformation($"플레이어 AP 사용 성공 : Id : {request.Id}");
                 return Ok(new
@@ -101,7 +101,7 @@ namespace Server.Api.Controller
             
             try
             {
-                var gold = await _goodsService.GetPlayerGoldAsync(userId, sessionId);
+                var gold = await _currencyService.GetPlayerGoldAsync(userId, sessionId);
                 
                 _logger.LogInformation($"플레이어 골드 조회 성공 : Id {userId}");
                 return Ok(new
@@ -116,9 +116,8 @@ namespace Server.Api.Controller
             }
         }
 
-        [HttpPatch("gold/{id}")]
+        [HttpPatch("gold/use")]
         public async Task<IActionResult> UsePlayerGold(
-            [FromRoute(Name = "id")] int userId,
             [FromBody] UsePlayerGoldRequest request)
         {
             _logger.LogInformation($"플레이어 골드 사용 시도 : Id : {request.Id}");
@@ -126,8 +125,8 @@ namespace Server.Api.Controller
             
             try
             {
-                await _goodsService.UsePlayerGoldAsync(request.Id, request.UsedGold, sessionId);
-                var currentGold = await _goodsService.GetPlayerGoldAsync(request.Id, sessionId);
+                await _currencyService.UsePlayerGoldAsync(request.Id, request.UsedGold, sessionId);
+                var currentGold = await _currencyService.GetPlayerGoldAsync(request.Id, sessionId);
                 
                 _logger.LogInformation($"플레이어 골드 사용 성공: Id : {request.Id} 사용 골드 : {request.UsedGold}");
                 return Ok(new
@@ -140,6 +139,13 @@ namespace Server.Api.Controller
                 _logger.LogError(ex, "플레이어 골드 사용 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
+        }
+
+        [HttpPatch("gold/add")]
+        public Task<IActionResult> AddPlayerGold(
+            [FromBody] UsePlayerGoldRequest request)
+        {
+            _logger.LogInformation($"플레이어 골드 추가 시도 : Id {request.Id}");
         }
     }
 }

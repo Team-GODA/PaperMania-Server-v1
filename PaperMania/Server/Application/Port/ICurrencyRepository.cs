@@ -2,7 +2,7 @@
 
 namespace Server.Application.Port;
 
-public interface IGoodsRepository
+public interface ICurrencyRepository
 {
     Task AddPlayerGoodsDataByUserIdAsync(int? userId);
     Task<PlayerGoodsData> GetPlayerGoodsDataByUserIdAsync(int userId);

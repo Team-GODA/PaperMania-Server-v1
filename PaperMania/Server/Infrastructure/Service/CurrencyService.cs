@@ -3,15 +3,15 @@ using Server.Domain.Entity;
 
 namespace Server.Infrastructure.Service;
 
-public class GoodsService : IGoodsService
+public class CurrencyService : ICurrencyService
 {
-    private readonly IGoodsRepository _goodsRepository;
+    private readonly ICurrencyRepository _currencyRepository;
     private readonly ISessionService _sessionService;
-    private readonly ILogger<GoodsService> _logger;
+    private readonly ILogger<CurrencyService> _logger;
 
-    public GoodsService(IGoodsRepository goodsRepository, ISessionService sessionService, ILogger<GoodsService> logger)
+    public CurrencyService(ICurrencyRepository currencyRepository, ISessionService sessionService, ILogger<CurrencyService> logger)
     {
-        _goodsRepository = goodsRepository;
+        _currencyRepository = currencyRepository;
         _sessionService = sessionService;
         _logger = logger;
     }
@@ -31,7 +31,7 @@ public class GoodsService : IGoodsService
     {
         await ValidateSessionAsync(sessionId);
         
-        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
         var updated = await RegenerateActionPointAsync(data);
 
         if (updated)
@@ -44,10 +44,10 @@ public class GoodsService : IGoodsService
     {
         await ValidateSessionAsync(sessionId);
         
-        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
         data.MaxActionPoint = newMaxActionPoint;
 
-        await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+        await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
         return newMaxActionPoint;
     }
 
@@ -55,31 +55,41 @@ public class GoodsService : IGoodsService
     {
         await ValidateSessionAsync(sessionId);
 
-        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
         await RegenerateActionPointAsync(data);
 
         data.ActionPoint = Math.Max(data.ActionPoint - usedActionPoint, 0);
         data.LastActionPointUpdated = DateTime.UtcNow;
 
-        await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+        await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
     }
 
     public async Task<int> GetPlayerGoldAsync(int userId, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
         
-        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
         return data.Gold;
+    }
+
+    public async Task AddPlayerGoldAsync(int userId, int gold, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        data.Gold += gold;
+        
+        await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
     }
 
     public async Task UsePlayerGoldAsync(int userId, int usedGold, string sessionId)
     {
         await ValidateSessionAsync(sessionId);
         
-        var data = await _goodsRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
         data.Gold = Math.Max(data.Gold - usedGold, 0);
         
-        await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+        await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
     }
 
     private async Task<bool> RegenerateActionPointAsync(PlayerGoodsData data)
@@ -106,7 +116,7 @@ public class GoodsService : IGoodsService
             _logger.LogInformation($"AP 증가: {apToAdd}, 새 AP: {currentActionPoint}");
             _logger.LogInformation($"LastActionPointUpdated 갱신: {data.LastActionPointUpdated}");
 
-            await _goodsRepository.UpdatePlayerGoodsDataAsync(data);
+            await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
             return true;
         }
 
