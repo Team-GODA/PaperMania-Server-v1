@@ -90,6 +90,34 @@ public class CurrencyService : ICurrencyService
         await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
     }
 
+    public async Task<int> GetPlayerPaperPieceAsync(int userId, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        ;
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        return data.PaperPiece;
+    }
+
+    public async Task AddPlayerPaperPieceAsync(int userId, int paperPiece, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        data.PaperPiece += paperPiece;
+        
+        await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
+    }
+
+    public async Task UsePlayerPaperPieceAsync(int userId, int usedPaperPiece, string sessionId)
+    {
+        await ValidateSessionAsync(sessionId);
+        
+        var data = await _currencyRepository.GetPlayerGoodsDataByUserIdAsync(userId);
+        data.PaperPiece = Math.Max(data.PaperPiece - usedPaperPiece, 0);
+        
+        await _currencyRepository.UpdatePlayerGoodsDataAsync(data);
+    }
+
     private async Task<bool> RegenerateActionPointAsync(PlayerGoodsData data)
     {
         var currentActionPoint = data.ActionPoint;
