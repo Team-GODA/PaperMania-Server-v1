@@ -125,20 +125,29 @@ namespace Server.Api.Controller
         }
 
         [HttpPatch("gold")]
-        public async Task<IActionResult> UsePlayerGold(
+        public async Task<IActionResult> UpdatePlayerGold(
             [FromBody] ModifyGoldRequest request)
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
             var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
-            
-            _logger.LogInformation($"플레이어 골드 사용 시도 : Id : {userId}");
-            
+
+            _logger.LogInformation($"플레이어 골드 갱신 시도: Id={userId}, Amount={request.Amount}");
+
             try
             {
-                await _currencyService.UsePlayerGoldAsync(userId, request.Amount, sessionId!);
-                var currentGold = await _currencyService.GetPlayerGoldAsync(userId, sessionId!);
+                if (request.Amount >= 0)
+                {
+                    _logger.LogInformation($"플레이어 골드 추가 성공 :  {userId}, Amount : {request.Amount}");
+                    await _currencyService.AddPlayerGoldAsync(userId, request.Amount, sessionId!);
+                }
+                else
+                {
+                    _logger.LogInformation($"플레이어 골드 사용 성공 : Id : {userId}, Amount : {request.Amount}");
+                    await _currencyService.UsePlayerGoldAsync(userId, -request.Amount, sessionId!);
+                }
                 
-                _logger.LogInformation($"플레이어 골드 사용 성공: Id : {userId} 사용 골드 : {request.Amount}");
+                var currentGold = await _currencyService.GetPlayerGoldAsync(userId, sessionId!);
+                _logger.LogInformation($"플레이어 골드 업데이트 성공: Id={userId}, CurrentGold={currentGold}");
                 return Ok(new
                 {
                     CurrentGold = currentGold
@@ -146,34 +155,7 @@ namespace Server.Api.Controller
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "플레이어 골드 사용 중 오류 발생");
-                return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
-            }
-        }
-
-        [HttpPatch("gold/add")]
-        public async Task<IActionResult> AddPlayerGold(
-            [FromBody] ModifyGoldRequest request)
-        {
-            var sessionId = HttpContext.Items["SessionId"] as string;
-            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
-            
-            _logger.LogInformation($"플레이어 골드 추가 시도 : Id : {userId}");
-
-            try
-            {
-                await _currencyService.AddPlayerGoldAsync(userId, request.Amount, sessionId!);
-                var currentGold = await _currencyService.GetPlayerGoldAsync(userId, sessionId!);
-                
-                _logger.LogInformation($"플레이어 골드 추가 성공 : Id : {userId}");
-                return Ok(new
-                {
-                    CurrentGold = currentGold
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "플레이어 골드 추가 중 오류 발생");
+                _logger.LogError(ex, "플레이어 골드 업데이트 중 오류 발생");
                 return StatusCode(500, new { message = "서버 오류가 발생했습니다." });
             }
         }
