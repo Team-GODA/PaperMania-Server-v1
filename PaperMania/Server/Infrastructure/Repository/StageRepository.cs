@@ -10,7 +10,7 @@ public class StageRepository : RepositoryBase, IStageRepository
     {
     }
 
-    public async Task CreatePlayerStageDataAsync(int userId)
+    public async Task CreatePlayerStageDataAsync(int userId)    
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
@@ -56,5 +56,24 @@ public class StageRepository : RepositoryBase, IStageRepository
         });
 
         return result ?? false;
+    }
+
+    public async Task UpdateIsClearedAsync(PlayerStageData data)
+    {
+        await using var db = CreateConnection();
+        await db.OpenAsync();
+
+        var sql = @"
+            UPDATE paper_mania_stage_data.player_stage_data
+            SET is_cleared = @IsCleared
+            WHERE id = @Id AND stage_num = @StageNum AND stage_sub_num = @SubStageNum";
+        
+        await db.ExecuteAsync(sql, new
+        {
+            Id = data.Id,
+            IsCleared = data.IsCleared,
+            StageNum = data.StageNum,
+            SubStageNum = data.SubStageNum
+        });
     }
 }
