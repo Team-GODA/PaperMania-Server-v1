@@ -1,4 +1,5 @@
 using System.Net;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Api.Filter;
@@ -6,6 +7,7 @@ using Server.Application.Port;
 
 namespace Server.Api.Controller
 {
+    [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     [ServiceFilter(typeof(SessionValidationFilter))]
