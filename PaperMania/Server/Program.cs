@@ -26,6 +26,7 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+builder.Services.AddScoped<IRewardService, RewardService>();
 builder.Services.AddScoped<SessionValidationFilter>();
 
 var keyName = "DbConnectionString";

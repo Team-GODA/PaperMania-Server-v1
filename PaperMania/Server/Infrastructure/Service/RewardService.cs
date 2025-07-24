@@ -12,9 +12,9 @@ public class RewardService : IRewardService
         _rewardRepository = rewardRepository;
     }
     
-    public async Task<StageReward?> GetStageRewardByUserIdAsync(int userId, int stageNum, int stageSubNum)
+    public async Task<StageReward?> GetStageRewardAsync(int stageNum, int stageSubNum)
     {
-        return await _rewardRepository.GetStageRewardByUserIdAsync(userId, stageNum, stageSubNum);
+        return await _rewardRepository.GetStageRewardAsync(stageNum, stageSubNum);
     }
     
     
