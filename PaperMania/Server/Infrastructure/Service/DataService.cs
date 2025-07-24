@@ -9,15 +9,19 @@ public class DataService : IDataService
     private readonly IAccountRepository _accountRepository;
     private readonly ICurrencyRepository _currencyRepository;
     private readonly ISessionService _sessionService;
+    private readonly IStageRepository _stageRepository;
     private readonly ILogger<DataService> _logger;
 
-    public DataService(IDataRepository dataRepository, IAccountRepository accountRepository
-        ,ICurrencyRepository currencyRepository, ISessionService sessionService, ILogger<DataService> logger)
+    public DataService(IDataRepository dataRepository, IAccountRepository accountRepository,
+        ICurrencyRepository currencyRepository, ISessionService sessionService,
+        IStageRepository stageRepository,
+        ILogger<DataService> logger)
     {
         _dataRepository = dataRepository;
         _accountRepository = accountRepository;
         _currencyRepository = currencyRepository;
         _sessionService = sessionService;
+        _stageRepository = stageRepository;
         _logger = logger;
     }
     
@@ -40,7 +44,7 @@ public class DataService : IDataService
         }
         
         await _dataRepository.AddPlayerDataAsync(userId, playerName);
-        await _currencyRepository.AddPlayerGoodsDataByUserIdAsync(userId);
+        await _stageRepository.CreatePlayerStageDataAsync(userId);
         await _accountRepository.UpdateIsNewAccountAsync(userId, false);
         
         return playerName;
