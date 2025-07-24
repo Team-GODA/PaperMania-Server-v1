@@ -68,6 +68,16 @@ builder.Services.AddScoped<IRewardRepository>(provider =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v1",
+        Title = "PaperMania API",
+        Description = "API Version 1"
+    });
+});
 
 builder.Services.AddApiVersioning(options =>
 {
@@ -77,6 +87,10 @@ builder.Services.AddApiVersioning(options =>
 });
 
 var app = builder.Build();
+
+app.UseSwagger();
+
+app.UseSwaggerUI();
 
 app.UseMiddleware<SessionRefresh>();
 
