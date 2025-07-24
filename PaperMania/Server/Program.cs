@@ -26,6 +26,7 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+builder.Services.AddScoped<IRewardService, RewardService>();
 builder.Services.AddScoped<SessionValidationFilter>();
 
 var keyName = "DbConnectionString";
@@ -50,6 +51,20 @@ builder.Services.AddScoped<ICurrencyRepository>(provider =>
     var connectionString = config[keyName];
 
     return new CurrencyRepository(connectionString!);
+});
+builder.Services.AddScoped<IStageRepository>(provider =>
+{
+    var config = provider.GetRequiredService<IConfiguration>();
+    var connectionString = config[keyName];
+
+    return new StageRepository(connectionString!);
+});
+builder.Services.AddScoped<IRewardRepository>(provider =>
+{
+    var config = provider.GetRequiredService<IConfiguration>();
+    var connectionString = config[keyName];
+
+    return new RewardRepository(connectionString!);
 });
 
 builder.Services.AddControllers();
