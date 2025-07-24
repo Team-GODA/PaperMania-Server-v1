@@ -1,5 +1,4 @@
-﻿using Google.Apis.Auth.OAuth2.Web;
-using Server.Application.Port;
+﻿using Server.Application.Port;
 
 namespace Server.Infrastructure.Service;
 
