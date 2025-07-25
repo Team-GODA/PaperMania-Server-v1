@@ -1,3 +1,4 @@
+using System.Text;
 using Azure.Identity;
 using Server.Api.Filter;
 using Server.Api.Middleware;
@@ -89,15 +90,11 @@ builder.Services.AddApiVersioning(options =>
 var app = builder.Build();
 
 app.UseSwagger();
-
 app.UseSwaggerUI();
 
 app.UseMiddleware<SessionRefresh>();
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

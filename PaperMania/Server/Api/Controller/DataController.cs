@@ -1,7 +1,7 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Application.Port;
-using System.Linq;
 using Asp.Versioning;
 using Server.Api.Filter;
 using Server.Domain.Entity;
@@ -30,10 +30,10 @@ namespace Server.Api.Controller
         /// </summary>
         /// <param name="request">플레이어 이름 등록 요청 객체</param>
         /// <returns>등록 성공 여부에 대한 응답</returns>
-        /// <response code="201">플레이어 이름이 성공적으로 등록됨</response>
-        /// <response code="409">세션 오류 또는 이미 존재하는 이름</response>
-        /// <response code="500">서버 오류</response>
         [HttpPost("player")]
+        [ProducesResponseType((int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> AddPlayerData([FromBody] AddPlayerDataRequest request)
         {
             _logger.LogInformation($"플레이어 이름 등록 시도: PlayerName = {request.PlayerName}");
@@ -67,9 +67,9 @@ namespace Server.Api.Controller
         /// 현재 플레이어의 이름을 조회합니다.
         /// </summary>
         /// <returns>플레이어 이름 정보</returns>
-        /// <response code="200">플레이어 이름 조회 성공</response>
-        /// <response code="500">서버 오류</response>
         [HttpGet("name")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPlayerName()
         {
             var sessionId =  HttpContext.Items["SessionId"] as string;
@@ -101,10 +101,10 @@ namespace Server.Api.Controller
         /// </summary>
         /// <param name="request">변경할 새 플레이어 이름 정보</param>
         /// <returns>변경된 이름 반환</returns>
-        /// <response code="200">이름 변경 성공</response>
-        /// <response code="409">요청 오류</response>
-        /// <response code="500">서버 오류</response>
         [HttpPatch("name")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RenamePlayerName([FromBody] RenamePlayerNameRequest request)
         {
             var sessionId =  HttpContext.Items["SessionId"] as string;
@@ -133,9 +133,9 @@ namespace Server.Api.Controller
         /// 플레이어의 현재 레벨과 경험치를 조회합니다.
         /// </summary>
         /// <returns>레벨 및 경험치 정보</returns>
-        /// <response code="200">레벨 조회 성공</response>
-        /// <response code="500">서버 오류</response>
         [HttpGet("level")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPlayerLevel()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -168,9 +168,9 @@ namespace Server.Api.Controller
         /// </summary>
         /// <param name="request">추가할 경험치 정보</param>
         /// <returns>갱신된 레벨 및 경험치 정보</returns>
-        /// <response code="200">레벨 갱신 성공</response>
-        /// <response code="500">서버 오류</response>
         [HttpPatch("level/exp")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> UpdatePlayerLevelByExp([FromBody] AddPlayerExpRequest request)
         {
             var sessionId =  HttpContext.Items["SessionId"] as string;
