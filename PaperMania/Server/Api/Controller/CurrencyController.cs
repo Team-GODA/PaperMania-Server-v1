@@ -1,11 +1,14 @@
 using System.Net;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
+using Server.Api.Dto.Response;
 using Server.Api.Filter;
 using Server.Application.Port;
 
 namespace Server.Api.Controller
 {
+    [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     [ServiceFilter(typeof(SessionValidationFilter))]
@@ -22,7 +25,16 @@ namespace Server.Api.Controller
             _logger = logger;
         }
         
+        /// <summary>
+        /// 플레이어의 현재 행동력을 조회합니다.
+        /// </summary>
+        /// <remarks>
+        /// 세션을 기반으로 사용자 ID를 식별하고, 현재 행동력을 조회합니다.
+        /// </remarks>
+        /// <returns>현재 행동력 정보</returns>
         [HttpGet("action-point")]
+        [ProducesResponseType(typeof(GetPlayerActionPointResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPlayerActionPointById()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -35,9 +47,9 @@ namespace Server.Api.Controller
                 var currentActionPoint = await _currencyService.GetPlayerActionPointAsync(userId, sessionId!);
                 
                 _logger.LogInformation($"플레이어 AP 조회 성공 : Id : {userId}");
-                return Ok(new
+                return Ok(new GetPlayerActionPointResponse
                 {
-                    currentActionPoint
+                    CurrentActionPoint = currentActionPoint
                 });
             }
             catch (Exception ex)
@@ -47,7 +59,14 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 최대 행동력을 수정합니다.
+        /// </summary>
+        /// <param name="request">새로운 최대 행동력 정보</param>
+        /// <returns>수정된 최대 행동력</returns>
         [HttpPatch("action-point/max")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> UpdatePlayerMaxActionPoint(
             [FromBody] UpdatePlayerMaxActionPointRequest request)
         {
@@ -73,7 +92,14 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 행동력을 소모합니다.
+        /// </summary>
+        /// <param name="request">소모할 행동력 양</param>
+        /// <returns>현재 행동력</returns>
         [HttpPatch("action-point")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> UsePlayerActionPoint(
             [FromBody] UsePlayerActionPointRequest request)
         {
@@ -100,7 +126,13 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 골드를 조회합니다.
+        /// </summary>
+        /// <returns>현재 골드</returns>
         [HttpGet("gold")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPlayerGold()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -125,7 +157,14 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 골드를 수정합니다. (양수: 추가, 음수: 차감)
+        /// </summary>
+        /// <param name="request">변경할 골드 양</param>
+        /// <returns>변경 후 현재 골드</returns>
         [HttpPatch("gold")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> UpdatePlayerGold(
             [FromBody] ModifyGoldRequest request)
         {
@@ -160,7 +199,13 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 종이 조각 수를 조회합니다.
+        /// </summary>
+        /// <returns>현재 종이 조각 개수</returns>
         [HttpGet("paper-piece")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetPlayerPaperPiece()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -185,7 +230,14 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 종이 조각을 수정합니다. (양수: 추가, 음수: 차감)
+        /// </summary>
+        /// <param name="request">변경할 종이 조각 수</param>
+        /// <returns>변경 후 현재 종이 조각 수</returns>
         [HttpPatch("paper-piece")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> UpdatePlayerPaperPiece(
             [FromBody] ModifyPaperPieceRequest request)
         {
