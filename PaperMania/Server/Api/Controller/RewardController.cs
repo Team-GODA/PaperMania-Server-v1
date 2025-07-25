@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Api.Filter;
@@ -6,6 +7,7 @@ using Server.Domain.Entity;
 
 namespace Server.Api.Controller
 {
+    [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class RewardController : ControllerBase
@@ -21,7 +23,16 @@ namespace Server.Api.Controller
             _logger = logger;
         }
 
+        /// <summary>
+        /// 특정 스테이지의 보상 정보를 조회합니다.
+        /// </summary>
+        /// <param name="stageNum">스테이지 번호</param>
+        /// <param name="stageSubNum">서브 스테이지 번호</param>
+        /// <returns>스테이지 보상 정보</returns>
         [HttpGet("stage")]
+        [ProducesResponseType(typeof(object), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> GetStageReward(
             [FromQuery] int stageNum,
             [FromQuery] int stageSubNum)
@@ -44,8 +55,16 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어가 특정 스테이지 보상을 수령합니다.
+        /// </summary>
+        /// <param name="request">수령할 스테이지 보상 정보</param>
+        /// <returns>수령 결과 메시지와 보상 내역</returns>
         [HttpPatch("stage")]
         [ServiceFilter(typeof(SessionValidationFilter))]
+        [ProducesResponseType(typeof(object), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> ClaimStageReward(
             [FromBody] ClaimStageRewardRequest request)
         {

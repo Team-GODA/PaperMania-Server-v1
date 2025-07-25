@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Api.Filter;
@@ -6,6 +7,7 @@ using Server.Domain.Entity;
 
 namespace Server.Api.Controller
 {
+    [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ServiceFilter(typeof(SessionValidationFilter))]
     [ApiController]
@@ -23,8 +25,15 @@ namespace Server.Api.Controller
             _logger = logger;
         }
         
+        /// <summary>
+        /// 특정 캐릭터 정보를 조회합니다.
+        /// </summary>
+        /// <param name="id">조회할 캐릭터의 ID</param>
+        /// <returns>캐릭터 정보</returns>
         [HttpGet]
-        public async Task<IActionResult> GetPlayerCharacterById()
+        [ProducesResponseType(typeof(IEnumerable<PlayerCharacterData>), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetAllPlayerCharacters()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
             var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
@@ -45,8 +54,15 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 유저의 보유 캐릭터를 추가합니다.
+        /// </summary>
+        /// <param name="request">추가할 캐릭터 정보</param>
+        /// <returns>추가된 캐릭터 정보</returns>
         [HttpPost]
-        public async Task<IActionResult> AddPlayerCharacterById(
+        [ProducesResponseType(typeof(PlayerCharacterData), 200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> AddPlayerCharacter(
             [FromBody] AddPlayerCharacterRequest request)
         {
             _logger.LogInformation($"플레이어 보유 캐릭터 추가 시도: Id: {request.Id}, CharacterId: {request.CharacterId}");
