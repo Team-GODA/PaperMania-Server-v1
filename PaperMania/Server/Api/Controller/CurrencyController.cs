@@ -2,6 +2,7 @@ using System.Net;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
+using Server.Api.Dto.Response;
 using Server.Api.Filter;
 using Server.Application.Port;
 
@@ -24,7 +25,15 @@ namespace Server.Api.Controller
             _logger = logger;
         }
         
-        [HttpGet("action-point")]
+        /// <summary>
+        /// 플레이어의 현재 행동력을 조회합니다.
+        /// </summary>
+        /// <remarks>
+        /// 세션을 기반으로 사용자 ID를 식별하고, 현재 행동력을 조회합니다.
+        /// </remarks>
+        /// <returns>현재 행동력 정보</returns>
+        /// <response code="200">정상적으로 행동력이 반환됨</response>
+        /// <response code="500">서버 내부 오류</response>
         public async Task<IActionResult> GetPlayerActionPointById()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -37,9 +46,9 @@ namespace Server.Api.Controller
                 var currentActionPoint = await _currencyService.GetPlayerActionPointAsync(userId, sessionId!);
                 
                 _logger.LogInformation($"플레이어 AP 조회 성공 : Id : {userId}");
-                return Ok(new
+                return Ok(new GetPlayerActionPointResponse
                 {
-                    currentActionPoint
+                    CurrentActionPoint = currentActionPoint
                 });
             }
             catch (Exception ex)
@@ -49,6 +58,13 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 최대 행동력을 수정합니다.
+        /// </summary>
+        /// <param name="request">새로운 최대 행동력 정보</param>
+        /// <returns>수정된 최대 행동력</returns>
+        /// <response code="200">정상적으로 최대 행동력이 수정됨</response>
+        /// <response code="500">서버 내부 오류</response>
         [HttpPatch("action-point/max")]
         public async Task<IActionResult> UpdatePlayerMaxActionPoint(
             [FromBody] UpdatePlayerMaxActionPointRequest request)
@@ -75,6 +91,13 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 행동력을 소모합니다.
+        /// </summary>
+        /// <param name="request">소모할 행동력 양</param>
+        /// <returns>현재 행동력</returns>
+        /// <response code="200">정상적으로 행동력이 소모됨</response>
+        /// <response code="500">서버 내부 오류</response>
         [HttpPatch("action-point")]
         public async Task<IActionResult> UsePlayerActionPoint(
             [FromBody] UsePlayerActionPointRequest request)
@@ -102,6 +125,12 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 골드를 조회합니다.
+        /// </summary>
+        /// <returns>현재 골드</returns>
+        /// <response code="200">정상적으로 골드가 반환됨</response>
+        /// <response code="500">서버 내부 오류</response>
         [HttpGet("gold")]
         public async Task<IActionResult> GetPlayerGold()
         {
@@ -127,6 +156,13 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 골드를 수정합니다. (양수: 추가, 음수: 차감)
+        /// </summary>
+        /// <param name="request">변경할 골드 양</param>
+        /// <returns>변경 후 현재 골드</returns>
+        /// <response code="200">정상적으로 골드가 변경됨</response>
+        /// <response code="500">서버 내부 오류</response>
         [HttpPatch("gold")]
         public async Task<IActionResult> UpdatePlayerGold(
             [FromBody] ModifyGoldRequest request)
@@ -162,6 +198,12 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 종이 조각 수를 조회합니다.
+        /// </summary>
+        /// <returns>현재 종이 조각 개수</returns>
+        /// <response code="200">정상적으로 종이 조각 개수가 반환됨</response>
+        /// <response code="500">서버 내부 오류</response>
         [HttpGet("paper-piece")]
         public async Task<IActionResult> GetPlayerPaperPiece()
         {
@@ -187,6 +229,13 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어의 종이 조각을 수정합니다. (양수: 추가, 음수: 차감)
+        /// </summary>
+        /// <param name="request">변경할 종이 조각 수</param>
+        /// <returns>변경 후 현재 종이 조각 수</returns>
+        /// <response code="200">정상적으로 종이 조각이 변경됨</response>
+        /// <response code="500">서버 내부 오류</response>
         [HttpPatch("paper-piece")]
         public async Task<IActionResult> UpdatePlayerPaperPiece(
             [FromBody] ModifyPaperPieceRequest request)

@@ -23,6 +23,15 @@ namespace Server.Api.Controller
             _logger = logger;
         }
 
+        /// <summary>
+        /// 특정 스테이지의 보상 정보를 조회합니다.
+        /// </summary>
+        /// <param name="stageNum">스테이지 번호</param>
+        /// <param name="stageSubNum">서브 스테이지 번호</param>
+        /// <returns>스테이지 보상 정보</returns>
+        /// <response code="200">스테이지 보상 조회 성공</response>
+        /// <response code="404">해당 스테이지 보상을 찾을 수 없음</response>
+        /// <response code="500">서버 오류</response>
         [HttpGet("stage")]
         public async Task<IActionResult> GetStageReward(
             [FromQuery] int stageNum,
@@ -46,6 +55,14 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 플레이어가 특정 스테이지 보상을 수령합니다.
+        /// </summary>
+        /// <param name="request">수령할 스테이지 보상 정보</param>
+        /// <returns>수령 결과 메시지와 보상 내역</returns>
+        /// <response code="200">스테이지 보상 수령 성공</response>
+        /// <response code="404">해당 스테이지 보상을 찾을 수 없음</response>
+        /// <response code="500">서버 오류</response>
         [HttpPatch("stage")]
         [ServiceFilter(typeof(SessionValidationFilter))]
         public async Task<IActionResult> ClaimStageReward(

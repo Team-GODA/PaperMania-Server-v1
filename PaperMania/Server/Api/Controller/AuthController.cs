@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Api.Dto.Response;
+using Server.Api.Filter;
 using Server.Application.Port;
 using Server.Domain.Entity;
 
@@ -21,7 +22,19 @@ namespace Server.Api.Controller
             _logger = logger;
         }
 
+        
+        /// <summary>
+        /// 신규 회원가입을 처리합니다.
+        /// </summary>
+        /// <param name="request">회원가입에 필요한 이메일, 비밀번호, PlayerId 등의 정보</param>
+        /// <returns>회원가입 성공 시 생성된 사용자 ID</returns>
+        /// <response code="201">회원가입이 성공적으로 완료됨</response>
+        /// <response code="409">중복된 이메일 또는 PlayerId</response>
+        /// <response code="500">서버 내부 오류</response>
         [HttpPost("register")]
+        [ProducesResponseType(typeof(RegisterResponse), 201)]
+        [ProducesResponseType(typeof(object), 409)]
+        [ProducesResponseType(typeof(object), 500)]
         public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegisterRequest request)
         {
             _logger.LogInformation("회원가입 시도: Email={Email}, PlayerId={PlayerId}", request.Email, request.PlayerId);
@@ -66,7 +79,18 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 로그인 요청을 처리합니다.
+        /// </summary>
+        /// <param name="request">로그인에 필요한 PlayerId와 비밀번호</param>
+        /// <returns>로그인 결과</returns>
+        /// <response code="200">로그인 성공</response>
+        /// <response code="401">인증 실패 (잘못된 PlayerId 또는 비밀번호)</response>
+        /// <response code="500">서버 내부 오류</response>
         [HttpPost("login")]
+        [ProducesResponseType(typeof(LoginResponse), 200)]
+        [ProducesResponseType(typeof(object), 401)]
+        [ProducesResponseType(typeof(object), 500)]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
         {
             _logger.LogInformation("로그인 시도: PlayerId={PlayerId}", request.PlayerId);
@@ -99,7 +123,15 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 구글 로그인 API
+        /// </summary>
+        /// <param name="request">구글 로그인 요청 정보</param>
+        /// <returns>로그인 결과</returns>
         [HttpPost("login/google")]
+        [ProducesResponseType(typeof(GoogleLoginResponse), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
         public async Task<ActionResult<GoogleLoginResponse>> LoginByGoogle([FromBody] GoogleLoginRequest request)
         {
             _logger.LogInformation("구글 로그인 시도");
@@ -128,9 +160,20 @@ namespace Server.Api.Controller
             }
         }
 
+        /// <summary>
+        /// 로그아웃 API
+        /// </summary>
+        /// <returns>로그아웃 결과</returns>
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromHeader(Name = "Session-Id")] string sessionId)
+        [ServiceFilter(typeof(SessionValidationFilter))]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
+        [ServiceFilter(typeof(SessionValidationFilter))]
+        public async Task<IActionResult> Logout()
         {
+            var sessionId = HttpContext.Items["SessionId"] as string;
+            
             _logger.LogInformation("로그아웃 시도: SessionId={SessionId}", sessionId);
             
             try
