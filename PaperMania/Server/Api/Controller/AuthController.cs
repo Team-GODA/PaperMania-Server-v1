@@ -169,7 +169,7 @@ namespace Server.Api.Controller
         /// <returns>로그아웃 결과</returns>
         [HttpPost("logout")]
         [ServiceFilter(typeof(SessionValidationFilter))]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(LogoutResponse), 200)]
         [ProducesResponseType(409)]
         [ProducesResponseType(500)]
         [ServiceFilter(typeof(SessionValidationFilter))]

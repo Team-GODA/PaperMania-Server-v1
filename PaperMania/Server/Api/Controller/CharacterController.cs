@@ -32,7 +32,7 @@ namespace Server.Api.Controller
         /// <param name="id">조회할 캐릭터의 ID</param>
         /// <returns>캐릭터 정보</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<PlayerCharacterData>), 200)]
+        [ProducesResponseType(typeof(GetAllPlayerCharactersResponse), 200)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<GetAllPlayerCharactersResponse>> GetAllPlayerCharacters()
         {
@@ -65,7 +65,7 @@ namespace Server.Api.Controller
         /// <param name="request">추가할 캐릭터 정보</param>
         /// <returns>추가된 캐릭터 정보</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(PlayerCharacterData), 200)]
+        [ProducesResponseType(typeof(AddPlayerCharacterResponse), 200)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<AddPlayerCharacterResponse>> AddPlayerCharacter(
             [FromBody] AddPlayerCharacterRequest request)
