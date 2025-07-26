@@ -29,7 +29,6 @@ namespace Server.Api.Controller
         /// <summary>
         /// 특정 캐릭터 정보를 조회합니다.
         /// </summary>
-        /// <param name="id">조회할 캐릭터의 ID</param>
         /// <returns>캐릭터 정보</returns>
         [HttpGet]
         [ProducesResponseType(typeof(GetAllPlayerCharactersResponse), 200)]

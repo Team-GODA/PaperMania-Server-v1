@@ -5,7 +5,6 @@ using Server.Application.Port;
 using Asp.Versioning;
 using Server.Api.Dto.Response;
 using Server.Api.Filter;
-using Server.Domain.Entity;
 
 namespace Server.Api.Controller
 {
@@ -85,7 +84,6 @@ namespace Server.Api.Controller
 
             try
             {
-                var id = userId;
                 var playerName = await _dataService.GetPlayerNameByUserIdAsync(userId);
 
                 var response = new GetPlayerNameResponse
