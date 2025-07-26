@@ -14,11 +14,14 @@ namespace Server.Api.Controller
     public class AuthController : ControllerBase
     {
         private readonly IAccountService _accountService;
+        private readonly ISessionService _sessionService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAccountService accountService, ILogger<AuthController> logger)
+        public AuthController(IAccountService accountService, ISessionService sessionService, 
+            ILogger<AuthController> logger)
         {
             _accountService = accountService;
+            _sessionService =  sessionService;
             _logger = logger;
         }
 
@@ -70,7 +73,7 @@ namespace Server.Api.Controller
                 };
 
                 _logger.LogInformation("회원가입 성공: Id={Id}, PlayerId={PlayerId}", response.Id, request.PlayerId);
-                return Created(string.Empty, response);
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -166,13 +169,14 @@ namespace Server.Api.Controller
         /// <returns>로그아웃 결과</returns>
         [HttpPost("logout")]
         [ServiceFilter(typeof(SessionValidationFilter))]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(LogoutResponse), 200)]
         [ProducesResponseType(409)]
         [ProducesResponseType(500)]
         [ServiceFilter(typeof(SessionValidationFilter))]
-        public async Task<IActionResult> Logout()
+        public async Task<ActionResult<LogoutResponse>> Logout()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
+            var userId =  await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
             
             _logger.LogInformation("로그아웃 시도: SessionId={SessionId}", sessionId);
             
@@ -191,8 +195,14 @@ namespace Server.Api.Controller
                     return Conflict(new { message = "유효하지 않은 세션입니다." });
                 }
 
+                var response = new LogoutResponse
+                {
+                    Id = userId,
+                    Message = "로그아웃 성공"
+                };
+
                 _logger.LogInformation("로그아웃 성공: SessionId={SessionId}", sessionId);
-                return Ok(new { message = "로그아웃 성공" });
+                return Ok(response);
             }
             catch (Exception ex)
             {

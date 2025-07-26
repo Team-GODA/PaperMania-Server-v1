@@ -12,7 +12,7 @@ public class CharacterService : ICharacterService
         _characterRepository = characterRepository;
     }
     
-    public async Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int userId)
+    public async Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int? userId)
     {
         return await _characterRepository.GetPlayerCharacterDataByUserIdAsync(userId);
     }
