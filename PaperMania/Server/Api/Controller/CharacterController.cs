@@ -44,7 +44,10 @@ namespace Server.Api.Controller
             try
             {
                 var data = await _characterService.GetPlayerCharacterDataByUserIdAsync(userId);
-                var response = new GetAllPlayerCharactersResponse(data);
+                var response = new GetAllPlayerCharactersResponse
+                {
+                    PlayerCharacters = data
+                };
                 
                 _logger.LogInformation($"플레이어 보유 캐릭터 데이터 조회 성공: ID: {userId}");
                 return Ok(response);
@@ -79,7 +82,11 @@ namespace Server.Api.Controller
                 };
 
                 var addedCharacter = await _characterService.AddPlayerCharacterDataByUserIdAsync(data);
-                var response = new AddPlayerCharacterResponse(addedCharacter);
+                var response = new AddPlayerCharacterResponse
+                {
+                    Id = addedCharacter.Id,
+                    CharacterId = addedCharacter.CharacterId
+                };
                 
                 _logger.LogInformation($"플레이어 보유 캐릭터 추가 성공: Id: {request.Id}, CharacterId: {request.CharacterId}");
                 return Ok(response);
