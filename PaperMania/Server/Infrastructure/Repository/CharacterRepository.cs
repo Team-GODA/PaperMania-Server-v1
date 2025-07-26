@@ -10,7 +10,7 @@ public class CharacterRepository : RepositoryBase, ICharacterRepository
     {
     }
 
-    public async Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int userId)
+    public async Task<IEnumerable<PlayerCharacterData>> GetPlayerCharacterDataByUserIdAsync(int? userId)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();

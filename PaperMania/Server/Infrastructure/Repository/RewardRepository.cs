@@ -34,7 +34,7 @@ public class RewardRepository : RepositoryBase, IRewardRepository
         return result;
     }
 
-    public async Task ClaimStageRewardByUserIdAsync(int userId, StageReward reward)
+    public async Task ClaimStageRewardByUserIdAsync(int? userId, StageReward reward)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
