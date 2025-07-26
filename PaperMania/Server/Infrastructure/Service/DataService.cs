@@ -50,31 +50,31 @@ public class DataService : IDataService
         return playerName;
     }
 
-    public async Task<string?> GetPlayerNameByUserIdAsync(int userId)
+    public async Task<string?> GetPlayerNameByUserIdAsync(int? userId)
     {
         var data = await GetPlayerDataByIdAsync(userId);
 
         return data?.PlayerName;
     }
 
-    public async Task<PlayerGameData?> GetPlayerDataByIdAsync(int userId)
+    public async Task<PlayerGameData?> GetPlayerDataByIdAsync(int? userId)
     {
         return await _dataRepository.GetPlayerDataByIdAsync(userId);
     }
 
-    public async Task<int> GetPlayerLevelByUserIdAsync(int userId)
+    public async Task<int> GetPlayerLevelByUserIdAsync(int? userId)
     {
         var data = await GetPlayerDataByUserId(userId);
         return data.PlayerLevel;
     }
 
-    public async Task<int> GetPlayerExpByUserIdAsync(int userId)
+    public async Task<int> GetPlayerExpByUserIdAsync(int? userId)
     {
         var data = await GetPlayerDataByUserId(userId);
         return data.PlayerExp;
     }
 
-    public async Task<PlayerGameData> UpdatePlayerLevelByExpAsync(int userId, int exp)
+    public async Task<PlayerGameData> UpdatePlayerLevelByExpAsync(int? userId, int exp)
     {
         var playerData = await GetPlayerDataByUserId(userId);
         playerData.PlayerExp += exp;
@@ -94,7 +94,7 @@ public class DataService : IDataService
         return playerData;
     }
 
-    public async Task RenamePlayerNameAsync(int userId, string newPlayerName)
+    public async Task RenamePlayerNameAsync(int? userId, string newPlayerName)
     {
         var exists = await _dataRepository.ExistsPlayerNameAsync(newPlayerName);
         if (exists != null)
@@ -112,7 +112,7 @@ public class DataService : IDataService
         return data;
     }
 
-    private async Task<PlayerGameData> GetPlayerDataByUserId(int userId)
+    private async Task<PlayerGameData> GetPlayerDataByUserId(int? userId)
     {
         var data = await _dataRepository.GetPlayerDataByIdAsync(userId);
         if (data == null)

@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
+using Server.Api.Dto.Response;
 using Server.Api.Filter;
 using Server.Application.Port;
 using Server.Domain.Entity;
@@ -30,10 +31,10 @@ namespace Server.Api.Controller
         /// <param name="stageSubNum">서브 스테이지 번호</param>
         /// <returns>스테이지 보상 정보</returns>
         [HttpGet("stage")]
-        [ProducesResponseType(typeof(object), 200)]
+        [ProducesResponseType(typeof(GetStageRewardResponse), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetStageReward(
+        public async Task<ActionResult<GetStageRewardResponse>> GetStageReward(
             [FromQuery] int stageNum,
             [FromQuery] int stageSubNum)
         {
@@ -44,9 +45,14 @@ namespace Server.Api.Controller
                 var reward = await _rewardService.GetStageRewardAsync(stageNum, stageSubNum);
                 if (reward == null)
                     return NotFound("해당 스테이지 보상이 없습니다.");
+
+                var response = new GetStageRewardResponse
+                {
+                    StageReward = reward
+                };
                 
                 _logger.LogInformation($"스테이지 보상 조회 성공 : StageNum = {stageNum}, StageSubNum = {stageSubNum}");
-                return Ok(reward);
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -87,15 +93,17 @@ namespace Server.Api.Controller
                     return NotFound("해당 스테이지 보상이 없습니다.");
                 
                 await _rewardService.ClaimStageRewardByUserIdAsync(userId, stageReward, stageData);
+
+                var response = new ClaimStageRewardResponse
+                {
+                    Message = "스테이지 보상 지급 완료",
+                    Id = userId,
+                    StageReward = stageReward
+                };
                 
                 _logger.LogInformation($"플레이어 스테이지 보상 수령 성공 : Id : {userId}");
 
-                return Ok(new
-                {
-                    message = "스테이지 보상 지급 완료",
-                    id = userId,
-                    stageReward = stageReward
-                });
+                return Ok(response);
             }
             catch (Exception ex)
             {

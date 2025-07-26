@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
+using Server.Api.Dto.Response;
 using Server.Api.Filter;
 using Server.Application.Port;
 using Server.Domain.Entity;
@@ -28,24 +29,27 @@ namespace Server.Api.Controller
         /// <summary>
         /// 특정 캐릭터 정보를 조회합니다.
         /// </summary>
-        /// <param name="id">조회할 캐릭터의 ID</param>
         /// <returns>캐릭터 정보</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<PlayerCharacterData>), 200)]
+        [ProducesResponseType(typeof(GetAllPlayerCharactersResponse), 200)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetAllPlayerCharacters()
+        public async Task<ActionResult<GetAllPlayerCharactersResponse>> GetAllPlayerCharacters()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
-            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId);
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
             
             _logger.LogInformation($"플레이어 보유 캐릭터 데이터 조회 시도: ID: {userId}");
             
             try
             {
                 var data = await _characterService.GetPlayerCharacterDataByUserIdAsync(userId);
-
+                var response = new GetAllPlayerCharactersResponse
+                {
+                    PlayerCharacters = data
+                };
+                
                 _logger.LogInformation($"플레이어 보유 캐릭터 데이터 조회 성공: ID: {userId}");
-                return Ok(data);
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -60,9 +64,9 @@ namespace Server.Api.Controller
         /// <param name="request">추가할 캐릭터 정보</param>
         /// <returns>추가된 캐릭터 정보</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(PlayerCharacterData), 200)]
+        [ProducesResponseType(typeof(AddPlayerCharacterResponse), 200)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> AddPlayerCharacter(
+        public async Task<ActionResult<AddPlayerCharacterResponse>> AddPlayerCharacter(
             [FromBody] AddPlayerCharacterRequest request)
         {
             _logger.LogInformation($"플레이어 보유 캐릭터 추가 시도: Id: {request.Id}, CharacterId: {request.CharacterId}");
@@ -77,9 +81,14 @@ namespace Server.Api.Controller
                 };
 
                 var addedCharacter = await _characterService.AddPlayerCharacterDataByUserIdAsync(data);
+                var response = new AddPlayerCharacterResponse
+                {
+                    Id = addedCharacter.Id,
+                    CharacterId = addedCharacter.CharacterId
+                };
                 
                 _logger.LogInformation($"플레이어 보유 캐릭터 추가 성공: Id: {request.Id}, CharacterId: {request.CharacterId}");
-                return Ok(addedCharacter);
+                return Ok(response);
             }
             catch (Exception ex)
             {

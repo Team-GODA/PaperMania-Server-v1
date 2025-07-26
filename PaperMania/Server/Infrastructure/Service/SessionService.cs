@@ -56,20 +56,14 @@ public class SessionService : ISessionService
         return true;
     }
 
-    public async Task<int> GetUserIdBySessionIdAsync(string sessionId)
+    public async Task<int?> GetUserIdBySessionIdAsync(string sessionId)
     {
         var value = await _cacheService.GetAsync(sessionId);
-        
         if (value != null && int.TryParse(value, out var userId))
-        {
-            _logger.LogInformation($"[GetUserIdBySessionIdAsync] 세션으로부터 UserId 조회 성공: SessionId={sessionId}, UserId={userId}");
             return userId;
-        }
-        else
-        {
-            _logger.LogWarning($"[GetUserIdBySessionIdAsync] 세션으로부터 UserId 조회 실패: SessionId={sessionId}");
-            return -1;
-        }
+
+        _logger.LogWarning($"세션 아이디로 유저 조회 실패: SessionId={sessionId}");
+        return null;
     }
 
     public async Task DeleteSessionAsync(string sessionId)

@@ -39,7 +39,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         await db.ExecuteAsync(sql, new { UserId = userId, PlayerName = playerName });
     }
 
-    public async Task<PlayerGameData?> GetPlayerDataByIdAsync(int userId)
+    public async Task<PlayerGameData?> GetPlayerDataByIdAsync(int? userId)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
@@ -53,7 +53,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         return await db.QueryFirstOrDefaultAsync<PlayerGameData>(sql, new { Id = userId });
     }
 
-    public async Task<PlayerGameData?> UpdatePlayerLevelAsync(int userId, int newLevel, int newExp)
+    public async Task<PlayerGameData?> UpdatePlayerLevelAsync(int? userId, int newLevel, int newExp)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
@@ -86,7 +86,7 @@ public class DataRepository : RepositoryBase, IDataRepository
         return await db.QueryFirstOrDefaultAsync<LevelDefinition>(sql, new { CurrentLevel = currentLevel });
     }
 
-    public async Task RenamePlayerNameAsync(int userId, string newPlayerName)
+    public async Task RenamePlayerNameAsync(int? userId, string newPlayerName)
     {
         await using var db = CreateConnection();
         await db.OpenAsync();
