@@ -35,7 +35,7 @@ namespace Server.Api.Controller
         [HttpGet("action-point")]
         [ProducesResponseType(typeof(GetPlayerActionPointResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetPlayerActionPointById()
+        public async Task<ActionResult<GetPlayerActionPointResponse>> GetPlayerActionPointById()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
             int userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
@@ -45,12 +45,13 @@ namespace Server.Api.Controller
             try
             {
                 var currentActionPoint = await _currencyService.GetPlayerActionPointAsync(userId, sessionId!);
-                
-                _logger.LogInformation($"플레이어 AP 조회 성공 : Id : {userId}");
-                return Ok(new GetPlayerActionPointResponse
+                var response = new GetPlayerActionPointResponse
                 {
                     CurrentActionPoint = currentActionPoint
-                });
+                };                         
+                
+                _logger.LogInformation($"플레이어 AP 조회 성공 : Id : {userId}");
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -65,9 +66,9 @@ namespace Server.Api.Controller
         /// <param name="request">새로운 최대 행동력 정보</param>
         /// <returns>수정된 최대 행동력</returns>
         [HttpPatch("action-point/max")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UpdatePlayerMaxActionPointResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> UpdatePlayerMaxActionPoint(
+        public async Task<ActionResult<UpdatePlayerMaxActionPointResponse>> UpdatePlayerMaxActionPoint(
             [FromBody] UpdatePlayerMaxActionPointRequest request)
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -78,12 +79,13 @@ namespace Server.Api.Controller
             try
             {
                 var newMaxActionPoint = await _currencyService.UpdatePlayerMaxActionPoint(userId, request.NewMaxActionPoint, sessionId!);
+                var response = new UpdatePlayerMaxActionPointResponse
+                {
+                    NewMaxActionPoint = newMaxActionPoint
+                };
                 
                 _logger.LogInformation($"플레이어 최대 AP 갱신 성공 : Id : {userId}");
-                return Ok(new
-                {
-                    newMaxActionPoint
-                });
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -98,9 +100,9 @@ namespace Server.Api.Controller
         /// <param name="request">소모할 행동력 양</param>
         /// <returns>현재 행동력</returns>
         [HttpPatch("action-point")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UsePlayerActionPointResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> UsePlayerActionPoint(
+        public async Task<ActionResult<UsePlayerActionPointResponse>> UsePlayerActionPoint(
             [FromBody] UsePlayerActionPointRequest request)
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -113,11 +115,13 @@ namespace Server.Api.Controller
                 await _currencyService.UsePlayerActionPointAsync(userId, request.UsedActionPoint, sessionId!);
                 var currentActionPoint = await _currencyService.GetPlayerActionPointAsync(userId, sessionId!);
 
-                _logger.LogInformation($"플레이어 AP 사용 성공 : Id : {userId}");
-                return Ok(new
+                var response = new UsePlayerActionPointResponse
                 {
                     CurrentActionPoint = currentActionPoint
-                });
+                };
+
+                _logger.LogInformation($"플레이어 AP 사용 성공 : Id : {userId}");
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -131,9 +135,9 @@ namespace Server.Api.Controller
         /// </summary>
         /// <returns>현재 골드</returns>
         [HttpGet("gold")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetPlayerGoldReponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetPlayerGold()
+        public async Task<ActionResult<GetPlayerGoldReponse>> GetPlayerGold()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
             var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
@@ -143,12 +147,13 @@ namespace Server.Api.Controller
             try
             {
                 var gold = await _currencyService.GetPlayerGoldAsync(userId, sessionId!);
+                var response = new GetPlayerGoldReponse
+                {
+                    CurrentGold = gold
+                };
                 
                 _logger.LogInformation($"플레이어 골드 조회 성공 : Id {userId}");
-                return Ok(new
-                {
-                    gold
-                });
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -163,9 +168,9 @@ namespace Server.Api.Controller
         /// <param name="request">변경할 골드 양</param>
         /// <returns>변경 후 현재 골드</returns>
         [HttpPatch("gold")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ModifyGoldResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> UpdatePlayerGold(
+        public async Task<ActionResult<ModifyGoldResponse>> UpdatePlayerGold(
             [FromBody] ModifyGoldRequest request)
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -187,10 +192,12 @@ namespace Server.Api.Controller
                 }
                 
                 var currentGold = await _currencyService.GetPlayerGoldAsync(userId, sessionId!);
-                return Ok(new
+                var response = new ModifyGoldResponse
                 {
                     CurrentGold = currentGold
-                });
+                };
+                
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -204,9 +211,9 @@ namespace Server.Api.Controller
         /// </summary>
         /// <returns>현재 종이 조각 개수</returns>
         [HttpGet("paper-piece")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetPlayerPaperPieceReponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetPlayerPaperPiece()
+        public async Task<ActionResult<GetPlayerPaperPieceReponse>> GetPlayerPaperPiece()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
             var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
@@ -216,12 +223,13 @@ namespace Server.Api.Controller
             try
             {
                 var currentPaperPiece = await _currencyService.GetPlayerPaperPieceAsync(userId, sessionId!);
+                var response = new GetPlayerPaperPieceReponse
+                {
+                    CurrentPaperPieces = currentPaperPiece
+                };
 
                 _logger.LogInformation($"플레이어 종이조각 조회 성공 : Id : {userId}");
-                return Ok(new
-                {
-                    currentPaperPiece = currentPaperPiece
-                });
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -238,7 +246,7 @@ namespace Server.Api.Controller
         [HttpPatch("paper-piece")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> UpdatePlayerPaperPiece(
+        public async Task<ActionResult<ModifyPaperPieceResponse>> UpdatePlayerPaperPiece(
             [FromBody] ModifyPaperPieceRequest request)
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -260,10 +268,12 @@ namespace Server.Api.Controller
                 }
 
                 var currentPaperPiece = await _currencyService.GetPlayerPaperPieceAsync(userId, sessionId!);
-                return Ok(new
+                var response = new ModifyPaperPieceResponse
                 {
-                    currentPaperPiece = currentPaperPiece
-                });
+                    CurrentPaperPieces = currentPaperPiece
+                };
+                
+                return Ok(response);
             }
             catch (Exception ex)
             {
