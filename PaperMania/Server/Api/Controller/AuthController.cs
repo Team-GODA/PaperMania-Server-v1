@@ -73,7 +73,7 @@ namespace Server.Api.Controller
                 };
 
                 _logger.LogInformation("회원가입 성공: Id={Id}, PlayerId={PlayerId}", response.Id, request.PlayerId);
-                return Created(string.Empty, response);
+                return Ok(response);
             }
             catch (Exception ex)
             {

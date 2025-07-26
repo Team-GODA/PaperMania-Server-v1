@@ -38,7 +38,7 @@ namespace Server.Api.Controller
         public async Task<ActionResult<GetPlayerActionPointResponse>> GetPlayerActionPointById()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
-            int userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
+            var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
             
             _logger.LogInformation($"플레이어 AP 조회 시도 : Id : {userId}");
             

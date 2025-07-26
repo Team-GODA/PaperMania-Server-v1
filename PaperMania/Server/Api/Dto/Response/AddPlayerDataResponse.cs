@@ -1,7 +1,7 @@
 ﻿namespace Server.Api.Dto.Response;
 
-public class LogoutResponse
+public class AddPlayerDataResponse
 {
-    public int? Id { get; set; }
     public string Message { get; set; }
+    public string PlayerName { get; set; }
 }

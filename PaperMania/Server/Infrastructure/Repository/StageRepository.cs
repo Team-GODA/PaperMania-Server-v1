@@ -10,7 +10,7 @@ public class StageRepository : RepositoryBase, IStageRepository
     {
     }
 
-    public async Task CreatePlayerStageDataAsync(int userId)    
+    public async Task CreatePlayerStageDataAsync(int? userId)    
     {
         await using var db = CreateConnection();
         await db.OpenAsync();

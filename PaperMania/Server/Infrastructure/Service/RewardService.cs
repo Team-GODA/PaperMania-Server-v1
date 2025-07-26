@@ -19,7 +19,7 @@ public class RewardService : IRewardService
         return await _rewardRepository.GetStageRewardAsync(stageNum, stageSubNum);
     }
 
-    public async Task ClaimStageRewardByUserIdAsync(int userId, StageReward reward, PlayerStageData data)
+    public async Task ClaimStageRewardByUserIdAsync(int? userId, StageReward reward, PlayerStageData data)
     {
         var stageReward = await _rewardRepository.GetStageRewardAsync(data.StageNum, data.SubStageNum);
         if (stageReward == null)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Application.Port;
 using Asp.Versioning;
+using Server.Api.Dto.Response;
 using Server.Api.Filter;
 using Server.Domain.Entity;
 
@@ -31,10 +32,10 @@ namespace Server.Api.Controller
         /// <param name="request">플레이어 이름 등록 요청 객체</param>
         /// <returns>등록 성공 여부에 대한 응답</returns>
         [HttpPost("player")]
-        [ProducesResponseType((int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(AddPlayerDataResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Conflict)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> AddPlayerData([FromBody] AddPlayerDataRequest request)
+        public async Task<ActionResult<AddPlayerDataResponse>> AddPlayerData([FromBody] AddPlayerDataRequest request)
         {
             _logger.LogInformation($"플레이어 이름 등록 시도: PlayerName = {request.PlayerName}");
             var sessionId = HttpContext.Items["SessionId"] as string;
@@ -42,9 +43,14 @@ namespace Server.Api.Controller
             try
             {
                 var result = await _dataService.AddPlayerDataAsync(request.PlayerName, sessionId);
+                var response = new AddPlayerDataResponse
+                {
+                    Message = "이름이 성공적으로 설정되었습니다.",
+                    PlayerName = result
+                };
 
                 _logger.LogInformation("플레이어 이름 등록 성공: PlayerName = {PlayerName}", request.PlayerName);
-                return Created(string.Empty, new { message = "이름이 성공적으로 설정되었습니다." });
+                return Ok(response);
             }
             catch (UnauthorizedAccessException)
             {
@@ -68,9 +74,9 @@ namespace Server.Api.Controller
         /// </summary>
         /// <returns>플레이어 이름 정보</returns>
         [HttpGet("name")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetPlayerNameResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetPlayerName()
+        public async Task<ActionResult<GetPlayerNameResponse>> GetPlayerName()
         {
             var sessionId =  HttpContext.Items["SessionId"] as string;
             var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
@@ -82,12 +88,14 @@ namespace Server.Api.Controller
                 var id = userId;
                 var playerName = await _dataService.GetPlayerNameByUserIdAsync(userId);
 
-                _logger.LogInformation($"플레이어 이름 조회 성공: PlayerName: {playerName}");
-                return Ok(new
+                var response = new GetPlayerNameResponse
                 {
-                    id,
-                    playerName
-                });
+                    Id = userId,
+                    PlayerName = playerName
+                };
+                
+                _logger.LogInformation($"플레이어 이름 조회 성공: PlayerName: {playerName}");
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -102,10 +110,10 @@ namespace Server.Api.Controller
         /// <param name="request">변경할 새 플레이어 이름 정보</param>
         /// <returns>변경된 이름 반환</returns>
         [HttpPatch("name")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(RenamePlayerNameResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Conflict)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RenamePlayerName([FromBody] RenamePlayerNameRequest request)
+        public async Task<ActionResult<RenamePlayerNameResponse>> RenamePlayerName([FromBody] RenamePlayerNameRequest request)
         {
             var sessionId =  HttpContext.Items["SessionId"] as string;
             var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
@@ -119,8 +127,14 @@ namespace Server.Api.Controller
 
                 await _dataService.RenamePlayerNameAsync(userId, request.NewName);
 
+                var response = new RenamePlayerNameResponse
+                {
+                    Id = userId,
+                    NewPlayerName = request.NewName
+                };
+
                 _logger.LogInformation($"플레이어 이름 재설정 성공: Id: {userId}, NewName: {request.NewName}");
-                return Ok(new { newName = request.NewName });
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -134,9 +148,9 @@ namespace Server.Api.Controller
         /// </summary>
         /// <returns>레벨 및 경험치 정보</returns>
         [HttpGet("level")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetPlayerLevelResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetPlayerLevel()
+        public async Task<ActionResult<GetPlayerLevelResponse>> GetPlayerLevel()
         {
             var sessionId = HttpContext.Items["SessionId"] as string;
             var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
@@ -148,13 +162,15 @@ namespace Server.Api.Controller
                 var level = await _dataService.GetPlayerLevelByUserIdAsync(userId);
                 var exp = await _dataService.GetPlayerExpByUserIdAsync(userId);
 
-                _logger.LogInformation($"플레이어 레벨 조회 성공: PlayerLevel: {level}");
-                return Ok(new
+                var response = new GetPlayerLevelResponse
                 {
-                    userId,
-                    level,
-                    exp
-                });
+                    Id = userId,
+                    Level = level,
+                    Exp = exp
+                };
+
+                _logger.LogInformation($"플레이어 레벨 조회 성공: PlayerLevel: {level}");
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -169,9 +185,9 @@ namespace Server.Api.Controller
         /// <param name="request">추가할 경험치 정보</param>
         /// <returns>갱신된 레벨 및 경험치 정보</returns>
         [HttpPatch("level/exp")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UpdatePlayerLevelByExpResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> UpdatePlayerLevelByExp([FromBody] AddPlayerExpRequest request)
+        public async Task<ActionResult<UpdatePlayerLevelByExpResponse>> UpdatePlayerLevelByExp([FromBody] AddPlayerExpRequest request)
         {
             var sessionId =  HttpContext.Items["SessionId"] as string;
             var userId = await _sessionService.GetUserIdBySessionIdAsync(sessionId!);
@@ -185,13 +201,15 @@ namespace Server.Api.Controller
                 var newLevel = data.PlayerLevel;
                 var newExp = data.PlayerExp;
 
-                _logger.LogInformation($"플레이어 레벨 갱신 성공: Id: {userId}");
-                return Ok(new
+                var response = new UpdatePlayerLevelByExpResponse
                 {
-                    userId,
-                    newLevel,
-                    newExp
-                });
+                    Id = userId,
+                    NewLevel = newLevel,
+                    NewExp = newExp
+                };
+
+                _logger.LogInformation($"플레이어 레벨 갱신 성공: Id: {userId}");
+                return Ok(response);
             }
             catch (Exception ex)
             {
